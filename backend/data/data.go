@@ -107,6 +107,14 @@ func BillSplitByUUID(uuid string) (billSplit BillSplit, err error) {
 }
 
 // Get a thread by the UUID
+func BillSplitByID(id int) (billSplit BillSplit, err error) {
+	err = Db.QueryRow("SELECT id, uuid, name, created_at FROM billsplit WHERE id = $1", id).
+		Scan(&billSplit.Id, &billSplit.Uuid, &billSplit.Name, &billSplit.CreatedAt)
+	return
+}
+
+
+// Get a thread by the UUID
 func BillSplitByName(name string) (billSplit BillSplit, err error) {
 	err = Db.QueryRow("SELECT id, uuid, name, created_at FROM billsplit WHERE name = $1", name).
 		Scan(&billSplit.Id, &billSplit.Uuid, &billSplit.Name, &billSplit.CreatedAt)

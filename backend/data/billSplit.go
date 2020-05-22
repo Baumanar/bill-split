@@ -1,7 +1,6 @@
 package data
 
 import (
-	"fmt"
 	"log"
 	"math"
 	"sort"
@@ -68,6 +67,8 @@ func (billSplit *BillSplit) ExpenseByUuid(name string) (expense Expense, err err
 }
 
 
+
+
 // get posts to a thread
 func (billSplit *BillSplit) ParticipantByName(name string) (participant Participant, err error) {
 	err = Db.QueryRow("SELECT id, uuid, name, created_at FROM participant WHERE name = $1 and billsplit_id= $2", name, billSplit.Id).
@@ -76,6 +77,34 @@ func (billSplit *BillSplit) ParticipantByName(name string) (participant Particip
 }
 
 
+
+// get posts to a thread
+func (billSplit *BillSplit) ParticipantsByName(names []string) (items []Participant, err error) {
+	//defer db.Close()
+	sqlStr := "SELECT id, uuid, name, billsplit_id, created_at FROM participant where billsplit_id = $1 and name in (?" + strings.Repeat(",?", len(names)-1) + ") ORDER BY created_at DESC"
+	sqlStr = ReplaceSQL(sqlStr, "?", 2)
+
+	args := make([]interface{}, len(names)+1)
+	args[0] = billSplit.Id
+	for i, id := range names {
+		args[i+1] = id
+	}
+	rows, err := Db.Query(sqlStr, args...)
+	// (?` + strings.Repeat(",?", len(args)-1) + `)`
+
+	if err != nil {
+		return
+	}
+	for rows.Next() {
+		post := Participant{}
+		if err = rows.Scan(&post.Id, &post.Uuid, &post.Name, &post.BillSplitID,  &post.CreatedAt); err != nil {
+			return
+		}
+		items = append(items, post)
+	}
+	rows.Close()
+	return
+}
 
 
 // Create a new item to a survey
@@ -95,10 +124,13 @@ func (billSplit *BillSplit) CreateParticipant(name string) (participant Particip
 	return
 }
 
+
+
+
 // ReplaceSQL replaces the instance occurrence of any string pattern with an increasing $n based sequence
-func ReplaceSQL(old, searchPattern string) string {
+func ReplaceSQL(old, searchPattern string, startCount int) string {
 	tmpCount := strings.Count(old, searchPattern)
-	for m := 1; m <= tmpCount; m++ {
+	for m := startCount; m <= (tmpCount+startCount-1); m++ {
 		old = strings.Replace(old, searchPattern, "$"+strconv.Itoa(m), 1)
 	}
 	return old
@@ -119,7 +151,7 @@ func (billSplit *BillSplit) CreateParticipants(names []string) (err error) {
 		sqlStr = strings.TrimSuffix(sqlStr, ",")
 
 		//Replacing ? with $n for postgres
-		sqlStr = ReplaceSQL(sqlStr, "?")
+		sqlStr = ReplaceSQL(sqlStr, "?", 1)
 
 		//prepare the statement
 		stmt, _ := Db.Prepare(sqlStr)
@@ -209,10 +241,6 @@ func (billSplit *BillSplit) GetDebts() (debts []Debt, err error) {
 	sort.Slice(sortedBalance, func(i, j int) bool {
 		return sortedBalance[i].Value < sortedBalance[j].Value
 	})
-
-
-	fmt.Println("sortedAmounts", sortedBalance)
-
 
 	i := 0
 	j := len(sortedBalance) - 1

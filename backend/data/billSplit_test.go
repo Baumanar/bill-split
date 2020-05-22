@@ -119,8 +119,8 @@ func TestBillSplit_GetDebts(t *testing.T) {
 	}{
 		{"test0", []Debt{
 			{"C", "B", 12.5},
-			{"D", "B", 2.5},
 			{"A", "B", 2.5},
+			{"D", "B", 2.5},
 		}, false},
 	}
 	for _, tt := range tests {
@@ -204,6 +204,39 @@ func TestBillSplit_CreateParticipants(t *testing.T) {
 		}
 		for idx, name := range gotNames {
 			if wantNames[idx] != name{
+				t.Errorf("gotExpense = %v, want %v", name, wantNames[idx])
+			}
+		}
+
+	})
+	Db.Close()
+}
+
+func TestBillSplit_ParticipantsByName(t *testing.T) {
+	InitDb()
+	SetupDB()
+
+	t.Run("TestBillSplit_ExpenseByUuid", func(t *testing.T) {
+		billSplit, err := CreateBillSplit("test0")
+		names := []string{"A", "B", "C", "D"}
+		wantNames := []string{"C", "B", "A"}
+		billSplit.CreateParticipants(names)
+		p, err := billSplit.Participants()
+		fmt.Println("got", p)
+
+		if err != nil {
+			log.Fatal(err)
+		}
+		gotParticipants, err := billSplit.ParticipantsByName([]string{"A", "B", "C"})
+		if err != nil {
+			log.Fatal(err)
+		}
+		gotNames := make([]string, 0)
+		for _, participant := range gotParticipants{
+			gotNames = append(gotNames, participant.Name)
+		}
+		for idx, name := range wantNames {
+			if gotNames[idx] != name{
 				t.Errorf("gotExpense = %v, want %v", name, wantNames[idx])
 			}
 		}

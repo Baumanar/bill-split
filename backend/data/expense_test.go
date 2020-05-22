@@ -105,7 +105,7 @@ func TestExpense_ExpenseParticipants(t *testing.T) {
 			"test0",
 			"bill0",
 			"expense0",
-			[]string{"A", "B", "C", "D"},
+			[]string{"D", "C","B", "A"},
 			[]string{"A", "B", "C", "D"},
 			false,
 		},
@@ -113,7 +113,7 @@ func TestExpense_ExpenseParticipants(t *testing.T) {
 			"test1",
 			"bill1",
 			"expense1",
-			[]string{"A", "B", "C", "D"},
+			[]string{"D", "C","B", "A"},
 			[]string{"A", "B", "C", "D","E"},
 			true,
 		},
@@ -153,5 +153,33 @@ func TestExpense_ExpenseParticipants(t *testing.T) {
 
 		})
 	}
+	Db.Close()
+}
+
+func TestExpense_AddParticipants(t *testing.T) {
+	InitDb()
+	SetupDB()
+
+	t.Run("TestBillSplit_ExpenseByUuid", func(t *testing.T) {
+		billSplit, err := CreateBillSplit("test0")
+		names := []string{"A", "B", "C", "D"}
+		wantNames := []string{"C", "B", "A"}
+		billSplit.CreateParticipants(names)
+		if err != nil {
+			log.Fatal(err)
+		}
+		expense, err :=billSplit.CreateExpense("testExpense", 100, "A")
+		expense.AddParticipants([]string{"A", "B", "C"})
+		parts, err := expense.ExpenseParticipants()
+		if err != nil {
+			log.Fatal(err)
+		}
+		for idx, name := range parts {
+			if wantNames[idx] != name{
+				t.Errorf("gotExpense = %v, want %v", name, wantNames[idx])
+			}
+		}
+
+	})
 	Db.Close()
 }

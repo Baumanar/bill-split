@@ -5,12 +5,23 @@
 
   <v-container>
 
+
     <v-layout wrap>
       <v-flex xs12 mr-1 ml-1>
         <v-card>
           <v-card-title primary-title>
-              <h2 class="headline mb-0">{{this.BillSplit.Name}}  -  Created At {{this.BillSplit.CreatedAt}}</h2>
+            <div>
+              <h2 class="headline mb-0">{{this.BillSplit.Name}}</h2>
+            </div>
+            <v-card-subtitle>
+              Created At {{this.BillSplit.CreatedAt}}
+              </v-card-subtitle>
           </v-card-title>
+                      <v-card-subtitle>
+                          <div>
+              <h2  class="headline mb-0">Manage participants</h2>
+            </div>
+              </v-card-subtitle>
           <v-card-actions>
             <v-btn text color="green" @click="back">back</v-btn>
           </v-card-actions>
