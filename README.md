@@ -4,7 +4,7 @@ Share expenses among friends easily by adding expenses to a bill split and autom
 of each participant.
 
  
-Features:
+**Features:**
 * View and add new bill splits
 
 ![HTTP Log-monitor](images/billsplitlist.png)
