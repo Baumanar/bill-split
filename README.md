@@ -37,9 +37,17 @@ The frontend uses Vuejs (Vuetify, axios, router)
 
 Backend serves at http://localhost:8010/
 
+It uses PostgreSQL as database and you'll need to create a new database:
+
+Launch postres: `sudo -u postgres psql`, and then run `creadb test_bill`
+Exit and then run: `psql -f backend/data/setup.sql -d test_bill`
+
+
 to build the backend run: `go build -o bill-split`
 
 to run it:  `./bill-split`
+
+If you want a demo mode with some fake data,  run `./bill-split -demo` instead
 
 ## Frontend build instructions
 
