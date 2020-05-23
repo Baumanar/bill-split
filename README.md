@@ -66,7 +66,7 @@ If you want a demo mode with some fake data,  run `./bill-split -demo` instead
 Frontend serves at http://localhost:8080/
 
 
-The backend server address can be set by an env var in the .env file:
+The backend server address can be set by an env var in the `frontend/.env` file:
 
  `VUE_APP_BACK_ADDR ` (default `http://localhost:8010`)
 
