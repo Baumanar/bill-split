@@ -15,6 +15,9 @@ var (
 	DB_USER     = Getenv("DB_USER", "postgres")
 	DB_PASSWORD     = Getenv("DB_PASSWORD", "password")
 	DB_NAME     = Getenv("DB_NAME", "test_bill")
+	DB_HOST     = Getenv("DB_HOST", "localhost")
+	DB_PORT     = Getenv("DB_PORT", "5432")
+
 )
 
 
@@ -42,7 +45,8 @@ func (t JSONTime)MarshalJSON() ([]byte, error) {
 var Db *sql.DB
 
 func InitDb() {
-	connectionString := fmt.Sprintf("user=%s password=%s dbname=%s sslmode=disable", DB_USER, DB_PASSWORD, DB_NAME)
+	connectionString := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable", DB_HOST, DB_PORT, DB_USER, DB_PASSWORD, DB_NAME)
+
 	var err error
 	Db, err = sql.Open("postgres", connectionString)
 	if err != nil {
