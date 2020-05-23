@@ -1,9 +1,8 @@
+# billsplit
 
 A simple bill splitting app with a Go backend and a Vuejs frontend communicating via a REST api.
-Share expenses among friends easily by adding expenses to a bill split and automatically get the balance 
-of each participant.
+Share expenses among friends easily by adding expenses to a bill split and automatically get the balance of each participant.
 
- 
 **Features:**
 * View and add new bill splits
 
@@ -55,8 +54,8 @@ The server address can also be set by an env var:
  `BACK_ADDR ` (default `:8010`)
 
 
-Launch postres: `sudo -u postgres psql`, and then run `creadb DB_NAME`
-Exit and then run: `psql -f backend/data/setup.sql -d DB_NAME`
+Launch Postgres: `sudo -u postgres psql`, and then run `creadb DB_NAME`
+Exit and then run: `psql -f database/init/setup.sql -d DB_NAME`
 
 
 to build the backend run: `go build -o bill-split`
