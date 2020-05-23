@@ -39,8 +39,20 @@ Backend serves at http://localhost:8010/
 
 It uses PostgreSQL as database and you'll need to create a new database:
 
-Launch postres: `sudo -u postgres psql`, and then run `creadb test_bill`
-Exit and then run: `psql -f backend/data/setup.sql -d test_bill`
+Database name, user and password can be set as env vars:
+
+`DB_USER` (default `postgres`)
+
+ `DB_PASSWORD` (default `password`)
+ 
+ `DB_NAME` (default `test_bill`)
+ 
+The server address can also be set by an env var:
+ `BACK_ADDR ` (default `:8010`)
+
+
+Launch postres: `sudo -u postgres psql`, and then run `creadb DB_NAME`
+Exit and then run: `psql -f backend/data/setup.sql -d DB_NAME`
 
 
 to build the backend run: `go build -o bill-split`
@@ -51,7 +63,12 @@ If you want a demo mode with some fake data,  run `./bill-split -demo` instead
 
 ## Frontend build instructions
 
-Backend serves at http://localhost:8080/
+Frontend serves at http://localhost:8080/
+
+
+The backend server address can be set by an env var in the .env file:
+
+ `VUE_APP_BACK_ADDR ` (default `http://localhost:8010`)
 
 ##### Project setup
 ```
