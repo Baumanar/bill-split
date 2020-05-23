@@ -47,6 +47,10 @@ Database name, user and password can be set as env vars:
  
  `DB_NAME` (default `test_bill`)
  
+  `DB_HOST` (default `localhost`)
+  
+   `DB_PORT` (default `5432`)
+ 
 The server address can also be set by an env var:
  `BACK_ADDR ` (default `:8010`)
 
