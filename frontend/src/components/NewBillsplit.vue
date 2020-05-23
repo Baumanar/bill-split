@@ -21,6 +21,7 @@
 
     <v-text-field
         v-model="name"
+        :counter="50"
         :rules="nameRules"
         label="Bill split name"
         required
@@ -31,6 +32,7 @@
       v-model="newPartName"
       id="new-part-name"
       label="Add a Participant"
+      :counter="50"
       :rules="nameRules"
     ></v-text-field>
     <v-btn

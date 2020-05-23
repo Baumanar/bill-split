@@ -34,7 +34,7 @@
       >
         <v-text-field
           v-model="name"
-          :counter="10"
+          :counter="50"
           :rules="nameRules"
           label="Expense name"
           required
@@ -114,7 +114,7 @@ export default {
 
       nameRules: [
         v => !!v || 'Name is required',
-        v => (v && v.length <= 10) || 'Name must be less than 10 characters',
+        v => (v && v.length <= 50) || 'Name must be less than 50 characters',
       ],
 
       BillSplit: '',

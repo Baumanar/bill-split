@@ -35,6 +35,7 @@
       v-model="newPartName"
       id="new-part-name"
       label="Add a Participant"
+      :counter="50"
       :rules="nameRules"
     ></v-text-field>
     <v-btn
