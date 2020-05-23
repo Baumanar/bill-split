@@ -86,7 +86,7 @@ axios.interceptors.request.use(request => {
 
     axios.defaults.headers.post['Access-Control-Allow-Origin'] = '*';
     axios
-      .get('http://localhost:8010/expense/'+this.expense_id)
+      .get(process.env.VUE_APP_BACK_ADDR+'/expense/'+this.expense_id)
       .then(response => {
         this.Expense = response.data
         console.log(this.Expense)
@@ -96,7 +96,7 @@ axios.interceptors.request.use(request => {
       })  
 
     axios
-      .get('http://localhost:8010/billsplit/'+this.id)
+      .get(process.env.VUE_APP_BACK_ADDR+'/billsplit/'+this.id)
       .then(response => {
         this.Billsplit = response.data
         console.log(this.Billsplit)

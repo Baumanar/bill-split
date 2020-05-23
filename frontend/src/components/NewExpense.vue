@@ -133,7 +133,7 @@ axios.interceptors.request.use(request => {
 
     axios.defaults.headers.post['Access-Control-Allow-Origin'] = '*';
     axios
-      .get('http://localhost:8010/billsplit/'+this.id)
+      .get(process.env.VUE_APP_BACK_ADDR+'/billsplit/'+this.id)
       .then(response => {
         this.BillSplit = response.data
         console.log(this.BillSplit)
@@ -143,7 +143,7 @@ axios.interceptors.request.use(request => {
       })
 
     axios
-      .get('http://localhost:8010/billsplit/'+this.id+'/participants')
+      .get(process.env.VUE_APP_BACK_ADDR+'/billsplit/'+this.id+'/participants')
       .then(response => {
         this.Participants = response.data
         console.log(this.Participants)
@@ -168,7 +168,7 @@ axios.interceptors.request.use(request => {
       };
       console.log(data);
 
-      axios.post('http://localhost:8010/billsplit/'+this.id+'/expenses/new', data, 
+      axios.post(process.env.VUE_APP_BACK_ADDR+'/billsplit/'+this.id+'/expenses/new', data, 
         {
         headers: {
           'Content-Type': 'application/json;charset=utf-8', 

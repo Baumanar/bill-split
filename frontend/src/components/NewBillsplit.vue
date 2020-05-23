@@ -11,6 +11,9 @@
               <h2>Create a new Bill Split</h2>
             </div>
           </v-card-title>
+          <v-card-actions>
+            <v-btn text color="green" @click="back">back</v-btn>
+          </v-card-actions>
 
       </v-card>
 
@@ -91,7 +94,7 @@ export default {
 
   methods: {
     back () {
-      this.$router.push('/billsplit/'+this.id)
+      this.$router.push('/')
     },
 
 
@@ -121,7 +124,7 @@ export default {
       };
       console.log(data);
 
-      axios.post('http://localhost:8010/billsplit/new', data, 
+      axios.post(process.env.VUE_APP_BACK_ADDR+'/billsplit/new', data, 
         {
         headers: {
           'Content-Type': 'application/json;charset=utf-8', 

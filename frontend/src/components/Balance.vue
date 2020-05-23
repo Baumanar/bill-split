@@ -90,7 +90,7 @@ export default {
   },
   mounted () {
       axios
-      .get('http://localhost:8010/billsplit/'+this.id+'/balance')
+      .get(process.env.VUE_APP_BACK_ADDR+'/billsplit/'+this.id+'/balance')
       .then(response => {
         this.Balance = response.data
         console.log(this.Balance)
@@ -100,7 +100,7 @@ export default {
       })
 
       axios
-      .get('http://localhost:8010/billsplit/'+this.id)
+      .get(process.env.VUE_APP_BACK_ADDR+'/billsplit/'+this.id)
       .then(response => {
         this.BillSplit = response.data
         console.log(this.BillSplit)
@@ -110,7 +110,7 @@ export default {
       })
 
       axios
-      .get('http://localhost:8010/billsplit/'+this.id+'/debts')
+      .get(process.env.VUE_APP_BACK_ADDR+'/billsplit/'+this.id+'/debts')
       .then(response => {
         this.Debts = response.data
         console.log(this.Debts)

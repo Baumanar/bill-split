@@ -104,7 +104,7 @@ export default {
 
   mounted () {
     axios
-      .get('http://localhost:8010/billsplit/'+this.id)
+      .get(process.env.VUE_APP_BACK_ADDR+'/billsplit/'+this.id)
       .then(response => {
         this.BillSplit = response.data
       })
@@ -113,7 +113,7 @@ export default {
       })
 
     axios
-      .get('http://localhost:8010/billsplit/'+this.id+'/participants')
+      .get(process.env.VUE_APP_BACK_ADDR+'/billsplit/'+this.id+'/participants')
       .then(response => {
         this.Participants = response.data
       })
@@ -151,7 +151,7 @@ export default {
     });
         console.log(names)
 
-      axios.post('http://localhost:8010/billsplit/'+this.id+'/participants/new', names, 
+      axios.post(process.env.VUE_APP_BACK_ADDR+'/billsplit/'+this.id+'/participants/new', names, 
         {
         headers: {
           'Content-Type': 'application/json;charset=utf-8', 

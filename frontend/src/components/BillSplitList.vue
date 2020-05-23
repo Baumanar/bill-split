@@ -58,7 +58,7 @@ export default {
   },
   mounted () {
   axios
-    .get('http://localhost:8010')
+    .get(process.env.VUE_APP_BACK_ADDR+'/')
     .then(response => {
       this.wholeResponse = response.data
       this.loading = false

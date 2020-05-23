@@ -17,7 +17,7 @@ type App struct {
 	DB     *sql.DB
 }
 
-func (a *App) Initialize(user, password, dbname string) {
+func (a *App) Initialize() {
 	var err error
 	data.InitDb()
 	a.DB = data.Db
@@ -27,8 +27,10 @@ func (a *App) Initialize(user, password, dbname string) {
 	a.Router = mux.NewRouter()
 }
 
+
 func (a *App) Run() {
-	log.Fatal(http.ListenAndServe(":8010", &CORSRouterDecorator{a.Router}))
+	addr := data.Getenv("BACK_ADDR", ":8010")
+	log.Fatal(http.ListenAndServe(addr, &CORSRouterDecorator{a.Router}))
 }
 
 // CORSRouterDecorator applies CORS headers to a mux.Router

@@ -7,14 +7,28 @@ import (
 	"fmt"
 	_ "github.com/lib/pq"
 	"log"
+	"os"
 	"time"
 )
 
-const (
-	DB_USER     = "postgres"
-	DB_PASSWORD = "password"
-	DB_NAME     = "test_bill"
+var (
+	DB_USER     = Getenv("DB_USER", "postgres")
+	DB_PASSWORD     = Getenv("DB_PASSWORD", "password")
+	DB_NAME     = Getenv("DB_NAME", "test_bill")
 )
+
+
+func Getenv(key, fallback string) string {
+	value := os.Getenv(key)
+	if len(value) == 0 {
+		fmt.Println(key, fallback)
+		return fallback
+	}
+	fmt.Println(key, value)
+	return value
+}
+
+
 
 type JSONTime time.Time
 
