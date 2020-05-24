@@ -25,7 +25,7 @@ func (a *App) Initialize() {
 }
 
 func (a *App) Run() {
-	addr := data.Getenv("BACK_ADDR", ":8010")
+	addr := data.GetEnv("BACK_ADDR", ":8010")
 	log.Fatal(http.ListenAndServe(addr, &CORSRouterDecorator{a.Router}))
 }
 

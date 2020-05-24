@@ -13,14 +13,20 @@ import (
 )
 
 var (
-	DB_USER     = Getenv("DB_USER", "postgres")
-	DB_PASSWORD = Getenv("DB_PASSWORD", "password")
-	DB_NAME     = Getenv("DB_NAME", "test_bill")
-	DB_HOST     = Getenv("DB_HOST", "localhost")
-	DB_PORT     = Getenv("DB_PORT", "5432")
+	// DB_USER: database username
+	DB_USER = GetEnv("DB_USER", "postgres")
+	// DB_PASSWORD: username password
+	DB_PASSWORD = GetEnv("DB_PASSWORD", "password")
+	// DB_NAME: database name
+	DB_NAME = GetEnv("DB_NAME", "test_bill")
+	// DB_HOST: database connection host
+	DB_HOST = GetEnv("DB_HOST", "localhost")
+	// DB_PORT: database connection port
+	DB_PORT = GetEnv("DB_PORT", "5432")
 )
 
-func Getenv(key, fallback string) string {
+// GetEnv gets the value of an env var, and if empty returns the default value
+func GetEnv(key, fallback string) string {
 	value := os.Getenv(key)
 	if len(value) == 0 {
 		fmt.Println(key, fallback)
@@ -42,13 +48,14 @@ func ReplaceSQL(old, searchPattern string, startCount int) string {
 // JSONTime is a time.Time type that implements MarshalJSON in order to have a custom time format
 type JSONTime time.Time
 
+// MarshalJSON returns custom time format
 func (t JSONTime) MarshalJSON() ([]byte, error) {
 	//do your serializing here
 	stamp := fmt.Sprintf("\"%s\"", time.Time(t).Format("02 January 2006"))
 	return []byte(stamp), nil
 }
 
-// Global Database variable
+// Db is the global Database variable
 var Db *sql.DB
 
 // InitDb initializes and opens a connection to the Database with the env vars parameters
@@ -82,8 +89,6 @@ func createUUID() (uuid string) {
 	uuid = fmt.Sprintf("%x-%x-%x-%x-%x", u[0:4], u[4:6], u[6:8], u[8:10], u[10:])
 	return
 }
-
-
 
 // CreateBillSplit create a new BillSplit in the DB
 func CreateBillSplit(name string) (billsplit BillSplit, err error) {
@@ -157,6 +162,7 @@ func ParticipantByUUID(uuid string) (participant Participant, err error) {
 		Scan(&participant.Id, &participant.Uuid, &participant.Name, &participant.BillSplitID, &participant.CreatedAt)
 	return
 }
+
 // ParticipantByName gets an Participant record in the DB by its name and billsplit ID (unique)
 func ParticipantByName(uuid string, billsplitID int) (participant Participant, err error) {
 	err = Db.QueryRow("SELECT id, uuid, name, billsplit_id, created_at FROM participant WHERE name = $1 and billsplit_id=$2", uuid, billsplitID).

@@ -6,7 +6,6 @@ import (
 	"testing"
 )
 
-
 func TestExpense_Balance(t *testing.T) {
 	InitDb()
 	SetupDB()
@@ -44,7 +43,6 @@ func TestExpense_Balance(t *testing.T) {
 				log.Fatal(err)
 			}
 
-
 			balance := expense1.Balance()
 			for k := range balance {
 				if balance[k] != tt.wantBalance[k] {
@@ -56,7 +54,7 @@ func TestExpense_Balance(t *testing.T) {
 		})
 	}
 	err := Db.Close()
-	if err != nil{
+	if err != nil {
 		log.Fatal(err)
 	}
 }
@@ -69,7 +67,7 @@ func TestExpense_ExpenseParticipants(t *testing.T) {
 		nameBill           string
 		nameExpense        string
 		participants       []string
-		wantParticipants []string
+		wantParticipants   []string
 		expenseParticipant []string
 		wantErr            bool
 	}{
@@ -98,14 +96,13 @@ func TestExpense_ExpenseParticipants(t *testing.T) {
 				log.Fatal(err)
 			}
 
-
-			err = expense1.AddParticipants(tt.expenseParticipant )
+			err = expense1.AddParticipants(tt.expenseParticipant)
 			if err != nil {
 				log.Fatal(err)
 			}
 
 			gotParticipants, err := expense1.ExpenseParticipants()
-			fmt.Println("gotParticipants d",len(gotParticipants))
+			fmt.Println("gotParticipants d", len(gotParticipants))
 			if err != nil {
 				log.Fatal(err)
 			}
@@ -118,9 +115,10 @@ func TestExpense_ExpenseParticipants(t *testing.T) {
 		})
 	}
 	err := Db.Close()
-	if err != nil{
+	if err != nil {
 		log.Fatal(err)
-	}}
+	}
+}
 
 func TestExpense_AddParticipants(t *testing.T) {
 	InitDb()
@@ -157,6 +155,7 @@ func TestExpense_AddParticipants(t *testing.T) {
 
 	})
 	err := Db.Close()
-	if err != nil{
+	if err != nil {
 		log.Fatal(err)
-	}}
+	}
+}

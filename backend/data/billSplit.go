@@ -52,21 +52,21 @@ func (billSplit *BillSplit) Expenses() (items []Expense, err error) {
 	return
 }
 
-// Expenses gets an expense in the DB by uuid
+// ExpenseByUuid gets an expense in the DB by uuid
 func (billSplit *BillSplit) ExpenseByUuid(name string) (expense Expense, err error) {
 	err = Db.QueryRow("SELECT e.id, e.uuid, e.name, e.amount, e.billsplit_id, p.name, e.created_at FROM expense e INNER JOIN participant p ON e.participant_id = p.id where e.uuid = $1 and e.billsplit_id = $2", name, billSplit.Id).
 		Scan(&expense.Id, &expense.Uuid, &expense.Name, &expense.Amount, &expense.BillSplitID, &expense.PayerName, &expense.CreatedAt)
 	return
 }
 
-// Expenses gets a Participant in the DB by name
+// ParticipantByName gets a Participant in the DB by name
 func (billSplit *BillSplit) ParticipantByName(name string) (participant Participant, err error) {
 	err = Db.QueryRow("SELECT id, uuid, name, created_at FROM participant WHERE name = $1 and billsplit_id= $2", name, billSplit.Id).
 		Scan(&participant.Id, &participant.Uuid, &participant.Name, &participant.CreatedAt)
 	return
 }
 
-// Expenses gets a Participants in the DB by name
+// ParticipantsByName gets a Participants in the DB by name
 // names: names of the participants to get
 func (billSplit *BillSplit) ParticipantsByName(names []string) (items []Participant, err error) {
 	//defer db.Close()
@@ -113,8 +113,8 @@ func (billSplit *BillSplit) CreateParticipant(name string) (participant Particip
 	return
 }
 
-
-// Create a new item to a survey
+// CreateParticipants creates new participants to the billsplit
+// name: names of the participants to create
 func (billSplit *BillSplit) CreateParticipants(names []string) (err error) {
 
 	sqlStr := "insert into participant(uuid, name, billsplit_id, created_at) VALUES "
@@ -138,7 +138,10 @@ func (billSplit *BillSplit) CreateParticipants(names []string) (err error) {
 	return
 }
 
-// Create a new item to a survey
+// CreateExpense creates a new expense to the billsplit
+// name: name of the expense to create
+// amount: amount of the expense
+// participantName: payer of the expense
 func (billSplit *BillSplit) CreateExpense(name string, amount float64, participantName string) (expense Expense, err error) {
 	//defer db.Close()
 	participant, err := billSplit.ParticipantByName(participantName)
@@ -158,7 +161,9 @@ func (billSplit *BillSplit) CreateExpense(name string, amount float64, participa
 	return
 }
 
-// Create a new item to a survey
+// CreateExpenseParticipants add participants to an existing expense
+// uuid: uuid of the expense
+// participantNames: participants to the expense
 func (billSplit *BillSplit) CreateExpenseParticipants(uuid string, participantNames []string) (err error) {
 	expense, err := billSplit.ExpenseByUuid(uuid)
 	for _, participant := range participantNames {
@@ -173,7 +178,7 @@ func (billSplit *BillSplit) CreateExpenseParticipants(uuid string, participantNa
 	return
 }
 
-// Create a new item to a survey
+// GetFullBalance gets the balance of each participants
 func (billSplit *BillSplit) GetFullBalance() (fullBalance map[string]float64, err error) {
 	expenses, err := billSplit.Expenses()
 	if err != nil {
@@ -202,6 +207,7 @@ type Debt struct {
 	Amount   float64
 }
 
+// GetDebts gets the debts of each participants
 func (billSplit *BillSplit) GetDebts() (debts []Debt, err error) {
 	debts = make([]Debt, 0)
 	balance, err := billSplit.GetFullBalance()

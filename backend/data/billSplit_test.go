@@ -64,7 +64,7 @@ func TestBillSplit_GetFullBalance(t *testing.T) {
 		})
 	}
 	err := Db.Close()
-	if err != nil{
+	if err != nil {
 		log.Fatal(err)
 	}
 }
@@ -107,22 +107,23 @@ func TestBillSplit_CreateParticipant(t *testing.T) {
 		})
 	}
 	err := Db.Close()
-	if err != nil{
+	if err != nil {
 		log.Fatal(err)
-	}}
+	}
+}
 
 func TestBillSplit_GetDebts(t *testing.T) {
 	InitDb()
 	SetupDB()
-	type value struct{
+	type value struct {
 		creditor string
-		amount float64
+		amount   float64
 	}
 
 	tests := []struct {
-		name      string
+		name         string
 		wantDebtsMap map[string]value
-		wantErr   bool
+		wantErr      bool
 	}{
 		{"test0", map[string]value{
 			"C": value{"B", 12.5},
@@ -159,23 +160,25 @@ func TestBillSplit_GetDebts(t *testing.T) {
 
 			gotDebts, err := billSplit.GetDebts()
 			gotDebtsMap := make(map[string]value)
-			for _, elem := range gotDebts{{
-				gotDebtsMap[elem.Debtor] = value{elem.Creditor, elem.Amount}
-			}}
+			for _, elem := range gotDebts {
+				{
+					gotDebtsMap[elem.Debtor] = value{elem.Creditor, elem.Amount}
+				}
+			}
 			fmt.Println(gotDebtsMap)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("GetDebts() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
-			for k := range tt.wantDebtsMap{
-				if tt.wantDebtsMap[k] != gotDebtsMap[k]{
+			for k := range tt.wantDebtsMap {
+				if tt.wantDebtsMap[k] != gotDebtsMap[k] {
 					t.Errorf("GetDebts() gotDebts = %v, want %v", gotDebtsMap[k], tt.wantDebtsMap[k])
 				}
 			}
 		})
 	}
 	err := Db.Close()
-	if err != nil{
+	if err != nil {
 		log.Fatal(err)
 	}
 }
@@ -207,9 +210,10 @@ func TestBillSplit_ExpenseByUuid(t *testing.T) {
 		}
 	})
 	err := Db.Close()
-	if err != nil{
+	if err != nil {
 		log.Fatal(err)
-	}}
+	}
+}
 
 func TestBillSplit_CreateParticipants(t *testing.T) {
 	InitDb()
@@ -242,9 +246,10 @@ func TestBillSplit_CreateParticipants(t *testing.T) {
 
 	})
 	err := Db.Close()
-	if err != nil{
+	if err != nil {
 		log.Fatal(err)
-	}}
+	}
+}
 
 func TestBillSplit_ParticipantsByName(t *testing.T) {
 	InitDb()
@@ -283,6 +288,7 @@ func TestBillSplit_ParticipantsByName(t *testing.T) {
 
 	})
 	err := Db.Close()
-	if err != nil{
+	if err != nil {
 		log.Fatal(err)
-	}}
+	}
+}
