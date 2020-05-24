@@ -1,7 +1,7 @@
 package data
 
 type ParticipantExpense struct {
-	Dd int
+	Dd            int
 	ParticipantId int
-	ExpenseId int
+	ExpenseId     int
 }

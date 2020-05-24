@@ -7,14 +7,13 @@ import (
 	_ "github.com/lib/pq"
 )
 
-
 func main() {
 	var flagvar bool
 	flag.BoolVar(&flagvar, "demo", false, "run the backend with demo data")
 	flag.Parse()
 	var app App
 	app.Initialize()
-	if flagvar{
+	if flagvar {
 		// Reset Database
 		fmt.Println("Running in demo mode")
 		data.SetupDB()
@@ -26,5 +25,3 @@ func main() {
 	app.Run()
 
 }
-
-

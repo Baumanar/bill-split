@@ -16,11 +16,9 @@ type BillSplit struct {
 	CreatedAt JSONTime
 }
 
-
 //func (billSplit *BillSplit) CreatedAtDate() string {
 //	return billSplit.CreatedAt.Format("Jan 2, 2006 at 3:04pm")
 //}
-
 
 // get posts to a thread
 func (billSplit *BillSplit) Participants() (items []Participant, err error) {
@@ -31,7 +29,7 @@ func (billSplit *BillSplit) Participants() (items []Participant, err error) {
 	}
 	for rows.Next() {
 		post := Participant{}
-		if err = rows.Scan(&post.Id, &post.Uuid, &post.Name, &post.BillSplitID,  &post.CreatedAt); err != nil {
+		if err = rows.Scan(&post.Id, &post.Uuid, &post.Name, &post.BillSplitID, &post.CreatedAt); err != nil {
 			return
 		}
 		items = append(items, post)
@@ -39,7 +37,6 @@ func (billSplit *BillSplit) Participants() (items []Participant, err error) {
 	rows.Close()
 	return
 }
-
 
 // get posts to a thread
 func (billSplit *BillSplit) Expenses() (items []Expense, err error) {
@@ -50,7 +47,7 @@ func (billSplit *BillSplit) Expenses() (items []Expense, err error) {
 	}
 	for rows.Next() {
 		post := Expense{}
-		if err = rows.Scan(&post.Id, &post.Uuid, &post.Name, &post.Amount, &post.BillSplitID, &post.PayerName,  &post.CreatedAt); err != nil {
+		if err = rows.Scan(&post.Id, &post.Uuid, &post.Name, &post.Amount, &post.BillSplitID, &post.PayerName, &post.CreatedAt); err != nil {
 			return
 		}
 		items = append(items, post)
@@ -62,12 +59,9 @@ func (billSplit *BillSplit) Expenses() (items []Expense, err error) {
 // get posts to a thread
 func (billSplit *BillSplit) ExpenseByUuid(name string) (expense Expense, err error) {
 	err = Db.QueryRow("SELECT e.id, e.uuid, e.name, e.amount, e.billsplit_id, p.name, e.created_at FROM expense e INNER JOIN participant p ON e.participant_id = p.id where e.uuid = $1 and e.billsplit_id = $2", name, billSplit.Id).
-		Scan(&expense.Id, &expense.Uuid, &expense.Name,  &expense.Amount, &expense.BillSplitID, &expense.PayerName,&expense.CreatedAt)
+		Scan(&expense.Id, &expense.Uuid, &expense.Name, &expense.Amount, &expense.BillSplitID, &expense.PayerName, &expense.CreatedAt)
 	return
 }
-
-
-
 
 // get posts to a thread
 func (billSplit *BillSplit) ParticipantByName(name string) (participant Participant, err error) {
@@ -75,8 +69,6 @@ func (billSplit *BillSplit) ParticipantByName(name string) (participant Particip
 		Scan(&participant.Id, &participant.Uuid, &participant.Name, &participant.CreatedAt)
 	return
 }
-
-
 
 // get posts to a thread
 func (billSplit *BillSplit) ParticipantsByName(names []string) (items []Participant, err error) {
@@ -97,7 +89,7 @@ func (billSplit *BillSplit) ParticipantsByName(names []string) (items []Particip
 	}
 	for rows.Next() {
 		post := Participant{}
-		if err = rows.Scan(&post.Id, &post.Uuid, &post.Name, &post.BillSplitID,  &post.CreatedAt); err != nil {
+		if err = rows.Scan(&post.Id, &post.Uuid, &post.Name, &post.BillSplitID, &post.CreatedAt); err != nil {
 			return
 		}
 		items = append(items, post)
@@ -105,7 +97,6 @@ func (billSplit *BillSplit) ParticipantsByName(names []string) (items []Particip
 	rows.Close()
 	return
 }
-
 
 // Create a new item to a survey
 func (billSplit *BillSplit) CreateParticipant(name string) (participant Participant, err error) {
@@ -124,42 +115,39 @@ func (billSplit *BillSplit) CreateParticipant(name string) (participant Particip
 	return
 }
 
-
-
-
 // ReplaceSQL replaces the instance occurrence of any string pattern with an increasing $n based sequence
 func ReplaceSQL(old, searchPattern string, startCount int) string {
 	tmpCount := strings.Count(old, searchPattern)
-	for m := startCount; m <= (tmpCount+startCount-1); m++ {
+	for m := startCount; m <= (tmpCount + startCount - 1); m++ {
 		old = strings.Replace(old, searchPattern, "$"+strconv.Itoa(m), 1)
 	}
 	return old
 }
 
-
 // Create a new item to a survey
 func (billSplit *BillSplit) CreateParticipants(names []string) (err error) {
 
-		sqlStr := "insert into participant(uuid, name, billsplit_id, created_at) VALUES "
-		vals := []interface{}{}
+	sqlStr := "insert into participant(uuid, name, billsplit_id, created_at) VALUES "
+	vals := []interface{}{}
 
-		for _, row := range names {
-			sqlStr += "(?, ?, ?, ?),"
-			vals = append(vals, createUUID(), row, billSplit.Id, time.Now())
-		}
-		//trim the last ,
-		sqlStr = strings.TrimSuffix(sqlStr, ",")
+	for _, row := range names {
+		sqlStr += "(?, ?, ?, ?),"
+		vals = append(vals, createUUID(), row, billSplit.Id, time.Now())
+	}
+	//trim the last ,
+	sqlStr = strings.TrimSuffix(sqlStr, ",")
 
-		//Replacing ? with $n for postgres
-		sqlStr = ReplaceSQL(sqlStr, "?", 1)
+	//Replacing ? with $n for postgres
+	sqlStr = ReplaceSQL(sqlStr, "?", 1)
 
-		//prepare the statement
-		stmt, _ := Db.Prepare(sqlStr)
+	//prepare the statement
+	stmt, _ := Db.Prepare(sqlStr)
 
-		//format all vals at once
-		_, err = stmt.Exec(vals...)
-		return
+	//format all vals at once
+	_, err = stmt.Exec(vals...)
+	return
 }
+
 // Create a new item to a survey
 func (billSplit *BillSplit) CreateExpense(name string, amount float64, participantName string) (expense Expense, err error) {
 	//defer db.Close()
@@ -167,13 +155,13 @@ func (billSplit *BillSplit) CreateExpense(name string, amount float64, participa
 	if err != nil {
 		return
 	}
-	_, err = Db.Exec("insert into expense (uuid, name, amount, billsplit_id, participant_id, created_at) values ($1, $2, $3, $4, $5, $6)", createUUID(), name, amount, billSplit.Id, participant.Id,time.Now())
+	_, err = Db.Exec("insert into expense (uuid, name, amount, billsplit_id, participant_id, created_at) values ($1, $2, $3, $4, $5, $6)", createUUID(), name, amount, billSplit.Id, participant.Id, time.Now())
 	statement := "SELECT e.id, e.uuid, e.name, e.amount, e.billsplit_id, p.name, e.created_at FROM expense e INNER JOIN participant p ON e.participant_id = p.id where e.name = $1 and e.billsplit_id = $2 "
 	if err != nil {
 		return
 	}
 	// use QueryRow to return a row and scan the returned id into the Session struct
-	err = Db.QueryRow(statement, name, billSplit.Id).Scan(&expense.Id, &expense.Uuid, &expense.Name,  &expense.Amount, &expense.BillSplitID,  &expense.PayerName, &expense.CreatedAt)
+	err = Db.QueryRow(statement, name, billSplit.Id).Scan(&expense.Id, &expense.Uuid, &expense.Name, &expense.Amount, &expense.BillSplitID, &expense.PayerName, &expense.CreatedAt)
 	if err != nil {
 		return
 	}
@@ -183,9 +171,9 @@ func (billSplit *BillSplit) CreateExpense(name string, amount float64, participa
 // Create a new item to a survey
 func (billSplit *BillSplit) CreateExpenseParticipants(uuid string, participantNames []string) (err error) {
 	expense, err := billSplit.ExpenseByUuid(uuid)
-	for _, participant := range participantNames{
+	for _, participant := range participantNames {
 		err := expense.AddParticipant(participant)
-		if err != nil{
+		if err != nil {
 			log.Fatal()
 		}
 	}
@@ -198,14 +186,14 @@ func (billSplit *BillSplit) CreateExpenseParticipants(uuid string, participantNa
 // Create a new item to a survey
 func (billSplit *BillSplit) GetFullBalance() (fullBalance map[string]float64, err error) {
 	expenses, err := billSplit.Expenses()
-	fullBalance = make(map[string] float64)
+	fullBalance = make(map[string]float64)
 	participants, err := billSplit.Participants()
-	for _, participant := range participants{
+	for _, participant := range participants {
 		fullBalance[participant.Name] = 0
 	}
-	for _, expense := range expenses{
+	for _, expense := range expenses {
 		balanceExpense := expense.Balance()
-		for k,v := range balanceExpense{
+		for k, v := range balanceExpense {
 			fullBalance[k] += v
 		}
 	}
@@ -215,11 +203,10 @@ func (billSplit *BillSplit) GetFullBalance() (fullBalance map[string]float64, er
 	return
 }
 
-
-type Debt struct{
-	Debtor string
+type Debt struct {
+	Debtor   string
 	Creditor string
-	Amount float64
+	Amount   float64
 }
 
 func (billSplit *BillSplit) GetDebts() (debts []Debt, err error) {
@@ -251,10 +238,9 @@ func (billSplit *BillSplit) GetDebts() (debts []Debt, err error) {
 		sortedBalance[i].Value += debt
 		sortedBalance[j].Value -= debt
 
-
 		debts = append(debts, Debt{
 			Debtor:   sortedBalance[i].Key,
-			Creditor:	sortedBalance[j].Key,
+			Creditor: sortedBalance[j].Key,
 			Amount:   debt,
 		})
 
@@ -267,11 +253,3 @@ func (billSplit *BillSplit) GetDebts() (debts []Debt, err error) {
 	}
 	return
 }
-
-
-
-
-
-
-
-

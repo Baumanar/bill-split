@@ -8,13 +8,12 @@ func TestCreateBillSplit(t *testing.T) {
 	InitDb()
 	SetupDB()
 	tests := []struct {
-		name       string
+		name     string
 		wantName string
-		wantErr    bool
+		wantErr  bool
 	}{
 		{"test0", "bill0", false},
 		{"test1", "bill1", false},
-
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

@@ -42,9 +42,9 @@ func TestExpense_Balance(t *testing.T) {
 	InitDb()
 	SetupDB()
 	tests := []struct {
-		name       string
+		name        string
 		wantBalance map[string]float64
-		wantErr    bool
+		wantErr     bool
 	}{
 		{
 			"testSurvey",
@@ -77,8 +77,8 @@ func TestExpense_Balance(t *testing.T) {
 			expense1.AddParticipant("D")
 
 			balance := expense1.Balance()
-			for k,_ := range balance{
-				if balance[k] != tt.wantBalance[k]{
+			for k, _ := range balance {
+				if balance[k] != tt.wantBalance[k] {
 					t.Errorf("want %f, got %f", balance[k], tt.wantBalance[k])
 				}
 			}
@@ -94,18 +94,18 @@ func TestExpense_ExpenseParticipants(t *testing.T) {
 	InitDb()
 	//SetupDB()
 	tests := []struct {
-		name string
-		nameBill string
-		nameExpense       string
-		participants []string
+		name               string
+		nameBill           string
+		nameExpense        string
+		participants       []string
 		expenseParticipant []string
-		wantErr    bool
+		wantErr            bool
 	}{
 		{
 			"test0",
 			"bill0",
 			"expense0",
-			[]string{"D", "C","B", "A"},
+			[]string{"D", "C", "B", "A"},
 			[]string{"A", "B", "C", "D"},
 			false,
 		},
@@ -113,8 +113,8 @@ func TestExpense_ExpenseParticipants(t *testing.T) {
 			"test1",
 			"bill1",
 			"expense1",
-			[]string{"D", "C","B", "A"},
-			[]string{"A", "B", "C", "D","E"},
+			[]string{"D", "C", "B", "A"},
+			[]string{"A", "B", "C", "D", "E"},
 			true,
 		},
 	}
@@ -124,7 +124,7 @@ func TestExpense_ExpenseParticipants(t *testing.T) {
 			if err != nil {
 				log.Fatal(err)
 			}
-			for _, part := range tt.participants{
+			for _, part := range tt.participants {
 				billSplit.CreateParticipant(part)
 
 			}
@@ -132,10 +132,10 @@ func TestExpense_ExpenseParticipants(t *testing.T) {
 			if err != nil {
 				log.Fatal(err)
 			}
-			for _, part := range tt.expenseParticipant{
+			for _, part := range tt.expenseParticipant {
 				err := expense1.AddParticipant(part)
-				if err != nil{
-					if !tt.wantErr{
+				if err != nil {
+					if !tt.wantErr {
 						t.Errorf("Got unwanted error")
 					}
 				}
@@ -149,7 +149,6 @@ func TestExpense_ExpenseParticipants(t *testing.T) {
 					t.Errorf("CreateSurvey() gotSurvey = %v, want %v", got, tt.participants[idx+1])
 				}
 			}
-
 
 		})
 	}
@@ -168,14 +167,14 @@ func TestExpense_AddParticipants(t *testing.T) {
 		if err != nil {
 			log.Fatal(err)
 		}
-		expense, err :=billSplit.CreateExpense("testExpense", 100, "A")
+		expense, err := billSplit.CreateExpense("testExpense", 100, "A")
 		expense.AddParticipants([]string{"A", "B", "C"})
 		parts, err := expense.ExpenseParticipants()
 		if err != nil {
 			log.Fatal(err)
 		}
 		for idx, name := range parts {
-			if wantNames[idx] != name{
+			if wantNames[idx] != name {
 				t.Errorf("gotExpense = %v, want %v", name, wantNames[idx])
 			}
 		}

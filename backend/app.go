@@ -9,9 +9,6 @@ import (
 	"net/http"
 )
 
-
-
-
 type App struct {
 	Router *mux.Router
 	DB     *sql.DB
@@ -26,7 +23,6 @@ func (a *App) Initialize() {
 	}
 	a.Router = mux.NewRouter()
 }
-
 
 func (a *App) Run() {
 	addr := data.Getenv("BACK_ADDR", ":8010")
@@ -52,15 +48,13 @@ func (c *CORSRouterDecorator) ServeHTTP(writer http.ResponseWriter, req *http.Re
 	c.R.ServeHTTP(writer, req)
 }
 
-
-
 func (a *App) NewBillSplit(writer http.ResponseWriter, request *http.Request) {
 	log.Println("NewBillSplit")
 	writer.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	writer.Header().Set("Access-Control-Allow-Origin", "*")
 
 	var body struct {
-		Name string
+		Name         string
 		Participants []string
 	}
 
@@ -101,7 +95,6 @@ func (a *App) GetBillSplitByUuid(writer http.ResponseWriter, request *http.Reque
 	respondWithJSON(writer, http.StatusOK, billSplit)
 }
 
-
 func (a *App) GetBillSplitExpenses(writer http.ResponseWriter, request *http.Request) {
 	log.Println("GetBillSplitExpenses")
 	writer.Header().Set("Content-Type", "application/json; charset=UTF-8")
@@ -138,7 +131,6 @@ func (a *App) GetBillSplitParticipants(writer http.ResponseWriter, request *http
 	}
 }
 
-
 func (a *App) NewParticipants(writer http.ResponseWriter, request *http.Request) {
 	log.Println("NewParticipants")
 	writer.Header().Set("Content-Type", "application/json; charset=UTF-8")
@@ -157,12 +149,12 @@ func (a *App) NewParticipants(writer http.ResponseWriter, request *http.Request)
 	}
 }
 
-type expenseInfo struct{
-	BillSplitID int
-	Name string
-	PayerName string
-	Amount float64
-	CreatedAt data.JSONTime
+type expenseInfo struct {
+	BillSplitID  int
+	Name         string
+	PayerName    string
+	Amount       float64
+	CreatedAt    data.JSONTime
 	Participants []string
 }
 
@@ -173,12 +165,11 @@ func (a *App) GetExpense(writer http.ResponseWriter, request *http.Request) {
 
 	expenseUuid := mux.Vars(request)["ExpenseId"]
 
-
 	expense, err := data.ExpenseByUuid(expenseUuid)
 	participants, err := expense.ExpenseParticipants()
 
 	expenseInfo := expenseInfo{
-		BillSplitID: expense.BillSplitID,
+		BillSplitID:  expense.BillSplitID,
 		Name:         expense.Name,
 		PayerName:    expense.PayerName,
 		Amount:       expense.Amount,
@@ -196,23 +187,22 @@ func (a *App) GetExpense(writer http.ResponseWriter, request *http.Request) {
 	}
 }
 
-
 func (a *App) NewExpense(writer http.ResponseWriter, request *http.Request) {
 	log.Println("NewExpense")
 	writer.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	writer.Header().Set("Access-Control-Allow-Origin", "*")
 	var body struct {
-		Expense string
-		Amount float64
-		Payer string
+		Expense      string
+		Amount       float64
+		Payer        string
 		Participants []string
 	}
 
 	json.NewDecoder(request.Body).Decode(&body)
 	billSplitUuid := mux.Vars(request)["BillSplitId"]
 	billSplit, err := data.BillSplitByUUID(billSplitUuid)
-	expense, err := billSplit.CreateExpense(body.Expense, body.Amount,body.Payer)
-	for _, particpantName := range body.Participants{
+	expense, err := billSplit.CreateExpense(body.Expense, body.Amount, body.Payer)
+	for _, particpantName := range body.Participants {
 		expense.AddParticipant(particpantName)
 	}
 	if err != nil {
@@ -221,8 +211,6 @@ func (a *App) NewExpense(writer http.ResponseWriter, request *http.Request) {
 		respondWithJSON(writer, http.StatusCreated, body)
 	}
 }
-
-
 
 func (a *App) GetParticipantsBalance(writer http.ResponseWriter, request *http.Request) {
 	log.Println("GetParticipantsBalance")
@@ -239,7 +227,6 @@ func (a *App) GetParticipantsBalance(writer http.ResponseWriter, request *http.R
 	}
 }
 
-
 func (a *App) GetDebts(writer http.ResponseWriter, request *http.Request) {
 	log.Println("GetDebts")
 	writer.Header().Set("Content-Type", "application/json; charset=UTF-8")
@@ -253,7 +240,6 @@ func (a *App) GetDebts(writer http.ResponseWriter, request *http.Request) {
 		respondWithJSON(writer, http.StatusCreated, debts)
 	}
 }
-
 
 func (a *App) GetBillSplits(writer http.ResponseWriter, request *http.Request) {
 	log.Println("GetBillSplits")
@@ -282,6 +268,3 @@ func (a *App) SetRoutes() {
 	a.Router.HandleFunc("/billsplit/{BillSplitId}/debts", a.GetDebts).Methods("GET")
 
 }
-
-
-

@@ -14,8 +14,6 @@ func errorMessage(writer http.ResponseWriter, request *http.Request, msg string)
 	http.Redirect(writer, request, strings.Join(url, ""), 302)
 }
 
-
-
 func respondWithJSON(w http.ResponseWriter, code int, payload interface{}) {
 	response, _ := json.Marshal(payload)
 
@@ -24,9 +22,7 @@ func respondWithJSON(w http.ResponseWriter, code int, payload interface{}) {
 	w.Write(response)
 }
 
-
-
-func PopulateDB(){
+func PopulateDB() {
 
 	//#####################################################################################
 	billSplit, err := data.CreateBillSplit("Flat sharing")
@@ -60,7 +56,6 @@ func PopulateDB(){
 
 	billSplit, err = data.CreateBillSplit("Holidays")
 	billSplit.CreateParticipants([]string{"Emma", "Steve", "Sophia", "Bill", "Patrick", "Lisa"})
-
 
 	expense, err = billSplit.CreateExpense("Groceries", 30.65, "Bill")
 	if err != nil {

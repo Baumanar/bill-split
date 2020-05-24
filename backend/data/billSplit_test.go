@@ -11,9 +11,9 @@ func TestBillSplit_GetFullBalance(t *testing.T) {
 	InitDb()
 	SetupDB()
 	tests := []struct {
-		name       string
+		name        string
 		wantBalance map[string]float64
-		wantErr    bool
+		wantErr     bool
 	}{
 		{
 			"testSurvey",
@@ -57,8 +57,8 @@ func TestBillSplit_GetFullBalance(t *testing.T) {
 				log.Fatal(err)
 			}
 
-			for k,_ := range gotBalance{
-				if tt.wantBalance[k] != gotBalance[k]{
+			for k, _ := range gotBalance {
+				if tt.wantBalance[k] != gotBalance[k] {
 					t.Errorf("Balance() gotSurvey = %v, want %v", gotBalance[k], tt.wantBalance[k])
 				}
 			}
@@ -96,9 +96,9 @@ func TestBillSplit_CreateParticipant(t *testing.T) {
 				t.Errorf("CreateParticipant() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
-			for idx, participant := range participants{
-				if participant.Name != tt.wantItem[idx]{
-					t.Errorf("CreateParticipant() gotItem = %v, want %v", participant.Name , tt.wantItem[idx])
+			for idx, participant := range participants {
+				if participant.Name != tt.wantItem[idx] {
+					t.Errorf("CreateParticipant() gotItem = %v, want %v", participant.Name, tt.wantItem[idx])
 
 				}
 			}
@@ -106,7 +106,6 @@ func TestBillSplit_CreateParticipant(t *testing.T) {
 	}
 	Db.Close()
 }
-
 
 func TestBillSplit_GetDebts(t *testing.T) {
 	InitDb()
@@ -175,7 +174,7 @@ func TestBillSplit_ExpenseByUuid(t *testing.T) {
 		}
 		uuid := expense.Uuid
 		gotExpense, err := billSplit.ExpenseByUuid(uuid)
-		if !reflect.DeepEqual(gotExpense, expense){
+		if !reflect.DeepEqual(gotExpense, expense) {
 			t.Errorf("gotExpense = %v, want %v", gotExpense, expense)
 		}
 	})
@@ -189,7 +188,7 @@ func TestBillSplit_CreateParticipants(t *testing.T) {
 	t.Run("TestBillSplit_ExpenseByUuid", func(t *testing.T) {
 		billSplit, err := CreateBillSplit("test0")
 		names := []string{"A", "B", "C", "D"}
-		wantNames := []string{"D","C", "B", "A"}
+		wantNames := []string{"D", "C", "B", "A"}
 		billSplit.CreateParticipants(names)
 		if err != nil {
 			log.Fatal(err)
@@ -199,11 +198,11 @@ func TestBillSplit_CreateParticipants(t *testing.T) {
 			log.Fatal(err)
 		}
 		gotNames := make([]string, 0)
-		for _, participant := range gotParticipants{
+		for _, participant := range gotParticipants {
 			gotNames = append(gotNames, participant.Name)
 		}
 		for idx, name := range gotNames {
-			if wantNames[idx] != name{
+			if wantNames[idx] != name {
 				t.Errorf("gotExpense = %v, want %v", name, wantNames[idx])
 			}
 		}
@@ -232,11 +231,11 @@ func TestBillSplit_ParticipantsByName(t *testing.T) {
 			log.Fatal(err)
 		}
 		gotNames := make([]string, 0)
-		for _, participant := range gotParticipants{
+		for _, participant := range gotParticipants {
 			gotNames = append(gotNames, participant.Name)
 		}
 		for idx, name := range wantNames {
-			if gotNames[idx] != name{
+			if gotNames[idx] != name {
 				t.Errorf("gotExpense = %v, want %v", name, wantNames[idx])
 			}
 		}

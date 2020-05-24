@@ -13,13 +13,11 @@ import (
 
 var (
 	DB_USER     = Getenv("DB_USER", "postgres")
-	DB_PASSWORD     = Getenv("DB_PASSWORD", "password")
+	DB_PASSWORD = Getenv("DB_PASSWORD", "password")
 	DB_NAME     = Getenv("DB_NAME", "test_bill")
 	DB_HOST     = Getenv("DB_HOST", "localhost")
 	DB_PORT     = Getenv("DB_PORT", "5432")
-
 )
-
 
 func Getenv(key, fallback string) string {
 	value := os.Getenv(key)
@@ -31,16 +29,13 @@ func Getenv(key, fallback string) string {
 	return value
 }
 
-
-
 type JSONTime time.Time
 
-func (t JSONTime)MarshalJSON() ([]byte, error) {
+func (t JSONTime) MarshalJSON() ([]byte, error) {
 	//do your serializing here
 	stamp := fmt.Sprintf("\"%s\"", time.Time(t).Format("02 January 2006"))
 	return []byte(stamp), nil
 }
-
 
 var Db *sql.DB
 
@@ -80,7 +75,6 @@ func Encrypt(plaintext string) (cryptext string) {
 	cryptext = fmt.Sprintf("%x", sha1.Sum([]byte(plaintext)))
 	return
 }
-
 
 // Create a new survey
 func CreateBillSplit(name string) (survey BillSplit, err error) {
@@ -131,7 +125,6 @@ func BillSplitByID(id int) (billSplit BillSplit, err error) {
 	return
 }
 
-
 // Get a thread by the UUID
 func BillSplitByName(name string) (billSplit BillSplit, err error) {
 	err = Db.QueryRow("SELECT id, uuid, name, created_at FROM billsplit WHERE name = $1", name).
@@ -139,11 +132,10 @@ func BillSplitByName(name string) (billSplit BillSplit, err error) {
 	return
 }
 
-
 // get posts to a thread
 func ExpenseByUuid(name string) (expense Expense, err error) {
 	err = Db.QueryRow("SELECT e.id, e.uuid, e.name, e.amount, e.billsplit_id, p.name, e.created_at FROM expense e INNER JOIN participant p ON e.participant_id = p.id where e.uuid = $1", name).
-		Scan(&expense.Id, &expense.Uuid, &expense.Name,  &expense.Amount, &expense.BillSplitID, &expense.PayerName,&expense.CreatedAt)
+		Scan(&expense.Id, &expense.Uuid, &expense.Name, &expense.Amount, &expense.BillSplitID, &expense.PayerName, &expense.CreatedAt)
 	return
 }
 
@@ -189,7 +181,6 @@ func ExpenseDeleteAll() (err error) {
 	return
 }
 
-
 // Delete all users from database
 func BillSplitDeleteAll() (err error) {
 	statement := "delete from billsplit"
@@ -210,11 +201,9 @@ func ParticipantExpenseDeleteAll() (err error) {
 	return
 }
 
-
 func SetupDB() {
 	ParticipantExpenseDeleteAll()
 	ExpenseDeleteAll()
 	ParticipantDeleteAll()
 	BillSplitDeleteAll()
 }
-

@@ -6,20 +6,19 @@ import (
 )
 
 type Expense struct {
-	Id        int
-	Uuid      string
-	Name      string
-	Amount    float64
-	BillSplitID   int
-	PayerName  string
-	CreatedAt JSONTime
+	Id          int
+	Uuid        string
+	Name        string
+	Amount      float64
+	BillSplitID int
+	PayerName   string
+	CreatedAt   JSONTime
 }
-
 
 // get posts to a thread
 func (expense *Expense) ExpenseParticipants() (items []string, err error) {
 	//defer db.Close()
-	rows, err := Db.Query(    "SELECT p.name FROM participant_expense pe INNER JOIN participant p ON p.id = pe.participant_id WHERE pe.expense_id = $1 ORDER BY created_at DESC", expense.Id)
+	rows, err := Db.Query("SELECT p.name FROM participant_expense pe INNER JOIN participant p ON p.id = pe.participant_id WHERE pe.expense_id = $1 ORDER BY created_at DESC", expense.Id)
 	if err != nil {
 		return
 	}
@@ -38,7 +37,7 @@ func (expense *Expense) ExpenseParticipants() (items []string, err error) {
 func (expense *Expense) AddParticipant(name string) (err error) {
 	//defer db.Close()
 	participant, err := ParticipantByName(name)
-	if err != nil{
+	if err != nil {
 		return
 	}
 	participantId := participant.Id
@@ -49,7 +48,7 @@ func (expense *Expense) AddParticipant(name string) (err error) {
 	}
 	defer stmt.Close()
 	// use QueryRow to return a row and scan the returned id into the Session struct
-	_, err  = stmt.Exec(participantId, expense.Id)
+	_, err = stmt.Exec(participantId, expense.Id)
 	return
 }
 
@@ -60,7 +59,7 @@ func (expense *Expense) AddParticipants(names []string) (err error) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	participants, err :=  billSplit.ParticipantsByName(names)
+	participants, err := billSplit.ParticipantsByName(names)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -85,17 +84,16 @@ func (expense *Expense) AddParticipants(names []string) (err error) {
 	return
 }
 
-
-func (expense Expense) Balance() map[string] float64{
+func (expense Expense) Balance() map[string]float64 {
 	participants, err := expense.ExpenseParticipants()
 	if err != nil {
 		log.Fatal(err)
 	}
 	payer, err := ParticipantByName(expense.PayerName)
-	balance := make(map[string] float64)
+	balance := make(map[string]float64)
 	balance[payer.Name] = expense.Amount
 	for _, participant := range participants {
-		balance[participant] += -expense.Amount/float64(len(participants))
+		balance[participant] += -expense.Amount / float64(len(participants))
 	}
 	return balance
 }
