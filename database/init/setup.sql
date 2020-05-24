@@ -1,7 +1,7 @@
-drop table participant_expense;
-drop table expense;
-drop table participant;
-drop table billSplit;
+drop table if exists participant_expense;
+drop table if exists expense;
+drop table if exists participant;
+drop table if exists billSplit;
 
 
 create table billSplit (
