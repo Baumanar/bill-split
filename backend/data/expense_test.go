@@ -6,37 +6,6 @@ import (
 	"testing"
 )
 
-//func TestExpense_ParticipantExpense(t *testing.T) {
-//	InitDb()
-//	SetupDB()
-//	tests := []struct {
-//		name       string
-//		wantSurvey []Participant
-//		wantErr    bool
-//	}{
-//		{
-//			"testSurvey",
-//			Survey{
-//				Id:        0,
-//				Uuid:      "",
-//				Name:      "testSurvey",
-//				CreatedAt: time.Now()},
-//			false},
-//	}
-//	for _, tt := range tests {
-//		t.Run(tt.name, func(t *testing.T) {
-//			gotSurvey, err := CreateSurvey(tt.name)
-//			if (err != nil) != tt.wantErr {
-//				t.Errorf("CreateSurvey() error = %v, wantErr %v", err, tt.wantErr)
-//				return
-//			}
-//			if gotSurvey.Name != tt.wantSurvey.Name {
-//				t.Errorf("CreateSurvey() gotSurvey = %v, want %v", gotSurvey, tt.wantSurvey)
-//			}
-//		})
-//	}
-//	Db.Close()
-//}
 
 func TestExpense_Balance(t *testing.T) {
 	InitDb()
@@ -62,22 +31,22 @@ func TestExpense_Balance(t *testing.T) {
 			if err != nil {
 				log.Fatal(err)
 			}
-			billSplit.CreateParticipant("A")
-			billSplit.CreateParticipant("B")
-			billSplit.CreateParticipant("C")
-			billSplit.CreateParticipant("D")
-			expense1, err := billSplit.CreateExpense("expense1", 40.0, "A")
+			err = billSplit.CreateParticipants([]string{"A", "B", "C", "D"})
 			if err != nil {
-				fmt.Println("lol")
 				log.Fatal(err)
 			}
-			expense1.AddParticipant("A")
-			expense1.AddParticipant("B")
-			expense1.AddParticipant("C")
-			expense1.AddParticipant("D")
+			expense1, err := billSplit.CreateExpense("expense1", 40.0, "A")
+			if err != nil {
+				log.Fatal(err)
+			}
+			err = expense1.AddParticipants([]string{"A", "B", "C", "D"})
+			if err != nil {
+				log.Fatal(err)
+			}
+
 
 			balance := expense1.Balance()
-			for k, _ := range balance {
+			for k := range balance {
 				if balance[k] != tt.wantBalance[k] {
 					t.Errorf("want %f, got %f", balance[k], tt.wantBalance[k])
 				}
@@ -86,8 +55,10 @@ func TestExpense_Balance(t *testing.T) {
 
 		})
 	}
-	Db.Close()
-
+	err := Db.Close()
+	if err != nil{
+		log.Fatal(err)
+	}
 }
 
 func TestExpense_ExpenseParticipants(t *testing.T) {
@@ -98,6 +69,7 @@ func TestExpense_ExpenseParticipants(t *testing.T) {
 		nameBill           string
 		nameExpense        string
 		participants       []string
+		wantParticipants []string
 		expenseParticipant []string
 		wantErr            bool
 	}{
@@ -105,17 +77,10 @@ func TestExpense_ExpenseParticipants(t *testing.T) {
 			"test0",
 			"bill0",
 			"expense0",
-			[]string{"D", "C", "B", "A"},
 			[]string{"A", "B", "C", "D"},
-			false,
-		},
-		{
-			"test1",
-			"bill1",
-			"expense1",
 			[]string{"D", "C", "B", "A"},
-			[]string{"A", "B", "C", "D", "E"},
-			true,
+			[]string{"D", "C", "B", "A"},
+			false,
 		},
 	}
 	for _, tt := range tests {
@@ -124,36 +89,38 @@ func TestExpense_ExpenseParticipants(t *testing.T) {
 			if err != nil {
 				log.Fatal(err)
 			}
-			for _, part := range tt.participants {
-				billSplit.CreateParticipant(part)
-
+			err = billSplit.CreateParticipants(tt.participants)
+			if err != nil {
+				log.Fatal(err)
 			}
 			expense1, err := billSplit.CreateExpense(tt.nameExpense, 10.0, tt.participants[0])
 			if err != nil {
 				log.Fatal(err)
 			}
-			for _, part := range tt.expenseParticipant {
-				err := expense1.AddParticipant(part)
-				if err != nil {
-					if !tt.wantErr {
-						t.Errorf("Got unwanted error")
-					}
-				}
+
+
+			err = expense1.AddParticipants(tt.expenseParticipant )
+			if err != nil {
+				log.Fatal(err)
 			}
+
 			gotParticipants, err := expense1.ExpenseParticipants()
+			fmt.Println("gotParticipants d",len(gotParticipants))
 			if err != nil {
 				log.Fatal(err)
 			}
 			for idx, got := range gotParticipants {
-				if got != tt.participants[idx] {
-					t.Errorf("CreateSurvey() gotSurvey = %v, want %v", got, tt.participants[idx+1])
+				if got != tt.wantParticipants[idx] {
+					t.Errorf("ExpenseParticipants() gotParticipants = %v, want %v", got, tt.wantParticipants[idx])
 				}
 			}
 
 		})
 	}
-	Db.Close()
-}
+	err := Db.Close()
+	if err != nil{
+		log.Fatal(err)
+	}}
 
 func TestExpense_AddParticipants(t *testing.T) {
 	InitDb()
@@ -161,14 +128,23 @@ func TestExpense_AddParticipants(t *testing.T) {
 
 	t.Run("TestBillSplit_ExpenseByUuid", func(t *testing.T) {
 		billSplit, err := CreateBillSplit("test0")
+		if err != nil {
+			log.Fatal(err)
+		}
 		names := []string{"A", "B", "C", "D"}
 		wantNames := []string{"C", "B", "A"}
-		billSplit.CreateParticipants(names)
+		err = billSplit.CreateParticipants(names)
 		if err != nil {
 			log.Fatal(err)
 		}
 		expense, err := billSplit.CreateExpense("testExpense", 100, "A")
-		expense.AddParticipants([]string{"A", "B", "C"})
+		if err != nil {
+			log.Fatal(err)
+		}
+		err = expense.AddParticipants([]string{"A", "B", "C"})
+		if err != nil {
+			log.Fatal(err)
+		}
 		parts, err := expense.ExpenseParticipants()
 		if err != nil {
 			log.Fatal(err)
@@ -180,5 +156,7 @@ func TestExpense_AddParticipants(t *testing.T) {
 		}
 
 	})
-	Db.Close()
-}
+	err := Db.Close()
+	if err != nil{
+		log.Fatal(err)
+	}}

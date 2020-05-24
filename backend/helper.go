@@ -19,15 +19,23 @@ func respondWithJSON(w http.ResponseWriter, code int, payload interface{}) {
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(code)
-	w.Write(response)
+	_, err := w.Write(response)
+	if err != nil {
+		log.Fatal(err)
+	}
 }
 
 func PopulateDB() {
 
 	//#####################################################################################
 	billSplit, err := data.CreateBillSplit("Flat sharing")
-	billSplit.CreateParticipants([]string{"Robin", "John", "Paul", "Mary"})
-
+	if err != nil {
+		log.Fatal(err)
+	}
+	err = billSplit.CreateParticipants([]string{"Robin", "John", "Paul", "Mary"})
+	if err != nil {
+		log.Fatal(err)
+	}
 	expense, err := billSplit.CreateExpense("Beers", 30.0, "Robin")
 	if err != nil {
 		log.Fatal(err)
@@ -55,8 +63,13 @@ func PopulateDB() {
 	//#####################################################################################
 
 	billSplit, err = data.CreateBillSplit("Holidays")
-	billSplit.CreateParticipants([]string{"Emma", "Steve", "Sophia", "Bill", "Patrick", "Lisa"})
-
+	if err != nil {
+		log.Fatal(err)
+	}
+	err = billSplit.CreateParticipants([]string{"Emma", "Steve", "Sophia", "Bill", "Patrick", "Lisa"})
+	if err != nil {
+		log.Fatal(err)
+	}
 	expense, err = billSplit.CreateExpense("Groceries", 30.65, "Bill")
 	if err != nil {
 		log.Fatal(err)

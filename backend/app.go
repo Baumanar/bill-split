@@ -58,12 +58,18 @@ func (a *App) NewBillSplit(writer http.ResponseWriter, request *http.Request) {
 		Participants []string
 	}
 
-	json.NewDecoder(request.Body).Decode(&body)
+	err := json.NewDecoder(request.Body).Decode(&body)
+	if err != nil {
+		errorMessage(writer, request, "Cannot create new BillSplit")
+	}
 
 	billSplit, err := data.CreateBillSplit(body.Name)
+	if err != nil {
+		errorMessage(writer, request, "Cannot get threads")
+	}
 	err = billSplit.CreateParticipants(body.Participants)
 	if err != nil {
-		errorMessage(writer, request, "Cannoue jst get threads")
+		errorMessage(writer, request, "Cannot create new BillSplit")
 	} else {
 		respondWithJSON(writer, http.StatusCreated, body)
 	}
@@ -139,11 +145,16 @@ func (a *App) NewParticipants(writer http.ResponseWriter, request *http.Request)
 	var participants []string
 	billSplitUuid := mux.Vars(request)["BillSplitId"]
 	billSplit, err := data.BillSplitByUUID(billSplitUuid)
-
-	json.NewDecoder(request.Body).Decode(&participants)
+	if err != nil {
+		errorMessage(writer, request, "Cannot create new Participants")
+	}
+	err = json.NewDecoder(request.Body).Decode(&participants)
+	if err != nil {
+		errorMessage(writer, request, "Cannot create new Participants")
+	}
 	err = billSplit.CreateParticipants(participants)
 	if err != nil {
-		errorMessage(writer, request, "Cannot jst get threads")
+		errorMessage(writer, request, "Cannot create new Participants")
 	} else {
 		respondWithJSON(writer, http.StatusCreated, participants)
 	}
@@ -166,6 +177,9 @@ func (a *App) GetExpense(writer http.ResponseWriter, request *http.Request) {
 	expenseUuid := mux.Vars(request)["ExpenseId"]
 
 	expense, err := data.ExpenseByUuid(expenseUuid)
+	if err != nil {
+		errorMessage(writer, request, "Cannot get threads")
+	}
 	participants, err := expense.ExpenseParticipants()
 
 	expenseInfo := expenseInfo{
@@ -198,13 +212,20 @@ func (a *App) NewExpense(writer http.ResponseWriter, request *http.Request) {
 		Participants []string
 	}
 
-	json.NewDecoder(request.Body).Decode(&body)
+	err := json.NewDecoder(request.Body).Decode(&body)
+	if err != nil {
+		errorMessage(writer, request, "Cannot get threads")
+	}
 	billSplitUuid := mux.Vars(request)["BillSplitId"]
 	billSplit, err := data.BillSplitByUUID(billSplitUuid)
-	expense, err := billSplit.CreateExpense(body.Expense, body.Amount, body.Payer)
-	for _, particpantName := range body.Participants {
-		expense.AddParticipant(particpantName)
+	if err != nil {
+		errorMessage(writer, request, "Cannot get threads")
 	}
+	expense, err := billSplit.CreateExpense(body.Expense, body.Amount, body.Payer)
+	if err != nil {
+		errorMessage(writer, request, "Cannot get threads")
+	}
+	err = expense.AddParticipants(body.Participants)
 	if err != nil {
 		errorMessage(writer, request, "Cannot get threads")
 	} else {
@@ -219,6 +240,9 @@ func (a *App) GetParticipantsBalance(writer http.ResponseWriter, request *http.R
 
 	billSplitUuid := mux.Vars(request)["BillSplitId"]
 	billSplit, err := data.BillSplitByUUID(billSplitUuid)
+	if err != nil {
+		errorMessage(writer, request, "Cannot get threads")
+	}
 	balance, err := billSplit.GetFullBalance()
 	if err != nil {
 		errorMessage(writer, request, "Cannot get threads")
@@ -233,6 +257,9 @@ func (a *App) GetDebts(writer http.ResponseWriter, request *http.Request) {
 	writer.Header().Set("Access-Control-Allow-Origin", "*")
 	billSplitUuid := mux.Vars(request)["BillSplitId"]
 	billSplit, err := data.BillSplitByUUID(billSplitUuid)
+	if err != nil {
+		errorMessage(writer, request, "Cannot get threads")
+	}
 	debts, err := billSplit.GetDebts()
 	if err != nil {
 		errorMessage(writer, request, "Cannot get threads")

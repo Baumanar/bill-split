@@ -2,12 +2,13 @@ package data
 
 import (
 	"crypto/rand"
-	"crypto/sha1"
 	"database/sql"
 	"fmt"
 	_ "github.com/lib/pq"
 	"log"
 	"os"
+	"strconv"
+	"strings"
 	"time"
 )
 
@@ -29,6 +30,16 @@ func Getenv(key, fallback string) string {
 	return value
 }
 
+// ReplaceSQL replaces the instance occurrence of any string pattern with an increasing $n based sequence
+func ReplaceSQL(old, searchPattern string, startCount int) string {
+	tmpCount := strings.Count(old, searchPattern)
+	for m := startCount; m <= (tmpCount + startCount - 1); m++ {
+		old = strings.Replace(old, searchPattern, "$"+strconv.Itoa(m), 1)
+	}
+	return old
+}
+
+// JSONTime is a time.Time type that implements MarshalJSON in order to have a custom time format
 type JSONTime time.Time
 
 func (t JSONTime) MarshalJSON() ([]byte, error) {
@@ -37,8 +48,10 @@ func (t JSONTime) MarshalJSON() ([]byte, error) {
 	return []byte(stamp), nil
 }
 
+// Global Database variable
 var Db *sql.DB
 
+// InitDb initializes and opens a connection to the Database with the env vars parameters
 func InitDb() {
 	connectionString := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable", DB_HOST, DB_PORT, DB_USER, DB_PASSWORD, DB_NAME)
 
@@ -52,7 +65,7 @@ func InitDb() {
 	}
 }
 
-// create a random UUID with from RFC 4122
+// createUUID creates a random UUID with from RFC 4122
 // adapted from http://github.com/nu7hatch/gouuid
 func createUUID() (uuid string) {
 	u := new([16]byte)
@@ -70,30 +83,29 @@ func createUUID() (uuid string) {
 	return
 }
 
-// hash plaintext with SHA-1
-func Encrypt(plaintext string) (cryptext string) {
-	cryptext = fmt.Sprintf("%x", sha1.Sum([]byte(plaintext)))
-	return
-}
 
-// Create a new survey
-func CreateBillSplit(name string) (survey BillSplit, err error) {
+
+// CreateBillSplit create a new BillSplit in the DB
+func CreateBillSplit(name string) (billsplit BillSplit, err error) {
 	//defer db.Close()
 	statement := "insert into billsplit (uuid, name, created_at) values ($1, $2, $3) returning id, uuid, name, created_at"
 	stmt, err := Db.Prepare(statement)
 	if err != nil {
 		return
 	}
-	defer stmt.Close()
 	// use QueryRow to return a row and scan the returned id into the Session struct
-	err = stmt.QueryRow(createUUID(), name, time.Now()).Scan(&survey.Id, &survey.Uuid, &survey.Name, &survey.CreatedAt)
+	err = stmt.QueryRow(createUUID(), name, time.Now()).Scan(&billsplit.Id, &billsplit.Uuid, &billsplit.Name, &billsplit.CreatedAt)
+	if err != nil {
+		return
+	}
+	err = stmt.Close()
 	if err != nil {
 		return
 	}
 	return
 }
 
-// Get all threads in the database and returns it
+// BillSplits gets all BillSplit records in the DB
 func BillSplits() (billSplits []BillSplit, err error) {
 	//defer db.Close()
 	rows, err := Db.Query("SELECT id, uuid, name, created_at FROM billsplit ORDER BY created_at DESC")
@@ -111,56 +123,55 @@ func BillSplits() (billSplits []BillSplit, err error) {
 	return
 }
 
-// Get a thread by the UUID
+// BillSplitByUUID gets a BillSplit record in the DB by its uuid
 func BillSplitByUUID(uuid string) (billSplit BillSplit, err error) {
 	err = Db.QueryRow("SELECT id, uuid, name, created_at FROM billsplit WHERE uuid = $1", uuid).
 		Scan(&billSplit.Id, &billSplit.Uuid, &billSplit.Name, &billSplit.CreatedAt)
 	return
 }
 
-// Get a thread by the UUID
+// BillSplitByID gets a BillSplit record in the DB by its id
 func BillSplitByID(id int) (billSplit BillSplit, err error) {
 	err = Db.QueryRow("SELECT id, uuid, name, created_at FROM billsplit WHERE id = $1", id).
 		Scan(&billSplit.Id, &billSplit.Uuid, &billSplit.Name, &billSplit.CreatedAt)
 	return
 }
 
-// Get a thread by the UUID
+// BillSplitByName gets a BillSplit record in the DB by its name (unique)
 func BillSplitByName(name string) (billSplit BillSplit, err error) {
 	err = Db.QueryRow("SELECT id, uuid, name, created_at FROM billsplit WHERE name = $1", name).
 		Scan(&billSplit.Id, &billSplit.Uuid, &billSplit.Name, &billSplit.CreatedAt)
 	return
 }
 
-// get posts to a thread
+// ExpenseByUuid gets an Expense record in the DB by its uuid (unique)
 func ExpenseByUuid(name string) (expense Expense, err error) {
 	err = Db.QueryRow("SELECT e.id, e.uuid, e.name, e.amount, e.billsplit_id, p.name, e.created_at FROM expense e INNER JOIN participant p ON e.participant_id = p.id where e.uuid = $1", name).
 		Scan(&expense.Id, &expense.Uuid, &expense.Name, &expense.Amount, &expense.BillSplitID, &expense.PayerName, &expense.CreatedAt)
 	return
 }
 
-// Get a thread by the UUID
+// ParticipantByUUID gets an Participant record in the DB by its uuid (unique)
 func ParticipantByUUID(uuid string) (participant Participant, err error) {
 	err = Db.QueryRow("SELECT id, uuid, name, billsplit_id, created_at FROM participant WHERE uuid = $1", uuid).
 		Scan(&participant.Id, &participant.Uuid, &participant.Name, &participant.BillSplitID, &participant.CreatedAt)
 	return
 }
-
-// Get a thread by the UUID
-func ParticipantByName(uuid string) (participant Participant, err error) {
-	err = Db.QueryRow("SELECT id, uuid, name, billsplit_id, created_at FROM participant WHERE name = $1", uuid).
+// ParticipantByName gets an Participant record in the DB by its name and billsplit ID (unique)
+func ParticipantByName(uuid string, billsplitID int) (participant Participant, err error) {
+	err = Db.QueryRow("SELECT id, uuid, name, billsplit_id, created_at FROM participant WHERE name = $1 and billsplit_id=$2", uuid, billsplitID).
 		Scan(&participant.Id, &participant.Uuid, &participant.Name, &participant.BillSplitID, &participant.CreatedAt)
 	return
 }
 
-// Get a thread by the UUID
+// ParticipantByID gets an Participant record in the DB by its id (unique)
 func ParticipantByID(id int) (participant Participant, err error) {
 	err = Db.QueryRow("SELECT id, uuid, name, billsplit_id, created_at FROM participant WHERE id = $1", id).
 		Scan(&participant.Id, &participant.Uuid, &participant.Name, &participant.BillSplitID, &participant.CreatedAt)
 	return
 }
 
-// Delete all Participant from database
+// ParticipantDeleteAll deletes all Participants from database
 func ParticipantDeleteAll() (err error) {
 	//defer db.Close()
 	statement := "delete  from participant"
@@ -171,7 +182,7 @@ func ParticipantDeleteAll() (err error) {
 	return
 }
 
-// Delete all surveys from database
+// ExpenseDeleteAll deletes all Expenses from database
 func ExpenseDeleteAll() (err error) {
 	statement := "delete from expense"
 	_, err = Db.Exec(statement)
@@ -181,7 +192,7 @@ func ExpenseDeleteAll() (err error) {
 	return
 }
 
-// Delete all users from database
+// BillSplitDeleteAll deletes all BillSplits from database
 func BillSplitDeleteAll() (err error) {
 	statement := "delete from billsplit"
 	_, err = Db.Exec(statement)
@@ -191,7 +202,7 @@ func BillSplitDeleteAll() (err error) {
 	return
 }
 
-// Delete all users from database
+// ParticipantExpenseDeleteAll deletes all ParticipantExpense from database
 func ParticipantExpenseDeleteAll() (err error) {
 	statement := "delete from participant_expense"
 	_, err = Db.Exec(statement)
@@ -202,8 +213,20 @@ func ParticipantExpenseDeleteAll() (err error) {
 }
 
 func SetupDB() {
-	ParticipantExpenseDeleteAll()
-	ExpenseDeleteAll()
-	ParticipantDeleteAll()
-	BillSplitDeleteAll()
+	err := ParticipantExpenseDeleteAll()
+	if err != nil {
+		log.Fatal(err)
+	}
+	err = ExpenseDeleteAll()
+	if err != nil {
+		log.Fatal(err)
+	}
+	err = ParticipantDeleteAll()
+	if err != nil {
+		log.Fatal(err)
+	}
+	err = BillSplitDeleteAll()
+	if err != nil {
+		log.Fatal(err)
+	}
 }

@@ -4,11 +4,11 @@ import (
 	"log"
 	"math"
 	"sort"
-	"strconv"
 	"strings"
 	"time"
 )
 
+// BillSplit holds DB info of a bill split
 type BillSplit struct {
 	Id        int
 	Uuid      string
@@ -16,11 +16,7 @@ type BillSplit struct {
 	CreatedAt JSONTime
 }
 
-//func (billSplit *BillSplit) CreatedAtDate() string {
-//	return billSplit.CreatedAt.Format("Jan 2, 2006 at 3:04pm")
-//}
-
-// get posts to a thread
+// Participants gets all participants in the DB to a BillSplit
 func (billSplit *BillSplit) Participants() (items []Participant, err error) {
 	//defer db.Close()
 	rows, err := Db.Query("SELECT id, uuid, name, billsplit_id, created_at FROM participant where billsplit_id = $1 ORDER BY created_at DESC", billSplit.Id)
@@ -38,7 +34,7 @@ func (billSplit *BillSplit) Participants() (items []Participant, err error) {
 	return
 }
 
-// get posts to a thread
+// Expenses gets all expenses in the DB of a BillSplit
 func (billSplit *BillSplit) Expenses() (items []Expense, err error) {
 	//defer db.Close()
 	rows, err := Db.Query("SELECT e.id, e.uuid, e.name, e.amount, e.billsplit_id, p.name, e.created_at FROM expense e INNER JOIN participant p ON e.participant_id = p.id where e.billSplit_id = $1 ORDER BY created_at DESC", billSplit.Id)
@@ -56,21 +52,22 @@ func (billSplit *BillSplit) Expenses() (items []Expense, err error) {
 	return
 }
 
-// get posts to a thread
+// Expenses gets an expense in the DB by uuid
 func (billSplit *BillSplit) ExpenseByUuid(name string) (expense Expense, err error) {
 	err = Db.QueryRow("SELECT e.id, e.uuid, e.name, e.amount, e.billsplit_id, p.name, e.created_at FROM expense e INNER JOIN participant p ON e.participant_id = p.id where e.uuid = $1 and e.billsplit_id = $2", name, billSplit.Id).
 		Scan(&expense.Id, &expense.Uuid, &expense.Name, &expense.Amount, &expense.BillSplitID, &expense.PayerName, &expense.CreatedAt)
 	return
 }
 
-// get posts to a thread
+// Expenses gets a Participant in the DB by name
 func (billSplit *BillSplit) ParticipantByName(name string) (participant Participant, err error) {
 	err = Db.QueryRow("SELECT id, uuid, name, created_at FROM participant WHERE name = $1 and billsplit_id= $2", name, billSplit.Id).
 		Scan(&participant.Id, &participant.Uuid, &participant.Name, &participant.CreatedAt)
 	return
 }
 
-// get posts to a thread
+// Expenses gets a Participants in the DB by name
+// names: names of the participants to get
 func (billSplit *BillSplit) ParticipantsByName(names []string) (items []Participant, err error) {
 	//defer db.Close()
 	sqlStr := "SELECT id, uuid, name, billsplit_id, created_at FROM participant where billsplit_id = $1 and name in (?" + strings.Repeat(",?", len(names)-1) + ") ORDER BY created_at DESC"
@@ -98,7 +95,8 @@ func (billSplit *BillSplit) ParticipantsByName(names []string) (items []Particip
 	return
 }
 
-// Create a new item to a survey
+// CreateParticipant creates a new participant
+// name: name of the participant to create
 func (billSplit *BillSplit) CreateParticipant(name string) (participant Participant, err error) {
 	//defer db.Close()
 	statement := "insert into participant (uuid, name, billsplit_id, created_at) values ($1, $2, $3, $4) returning id, uuid, name, billSplit_id, created_at"
@@ -115,14 +113,6 @@ func (billSplit *BillSplit) CreateParticipant(name string) (participant Particip
 	return
 }
 
-// ReplaceSQL replaces the instance occurrence of any string pattern with an increasing $n based sequence
-func ReplaceSQL(old, searchPattern string, startCount int) string {
-	tmpCount := strings.Count(old, searchPattern)
-	for m := startCount; m <= (tmpCount + startCount - 1); m++ {
-		old = strings.Replace(old, searchPattern, "$"+strconv.Itoa(m), 1)
-	}
-	return old
-}
 
 // Create a new item to a survey
 func (billSplit *BillSplit) CreateParticipants(names []string) (err error) {
@@ -186,6 +176,9 @@ func (billSplit *BillSplit) CreateExpenseParticipants(uuid string, participantNa
 // Create a new item to a survey
 func (billSplit *BillSplit) GetFullBalance() (fullBalance map[string]float64, err error) {
 	expenses, err := billSplit.Expenses()
+	if err != nil {
+		log.Fatal(err)
+	}
 	fullBalance = make(map[string]float64)
 	participants, err := billSplit.Participants()
 	for _, participant := range participants {

@@ -18,7 +18,7 @@ type Expense struct {
 // get posts to a thread
 func (expense *Expense) ExpenseParticipants() (items []string, err error) {
 	//defer db.Close()
-	rows, err := Db.Query("SELECT p.name FROM participant_expense pe INNER JOIN participant p ON p.id = pe.participant_id WHERE pe.expense_id = $1 ORDER BY created_at DESC", expense.Id)
+	rows, err := Db.Query("SELECT p.name FROM participant_expense pe INNER JOIN participant p ON p.id = pe.participant_id WHERE pe.expense_id = $1 ORDER BY p.created_at DESC", expense.Id)
 	if err != nil {
 		return
 	}
@@ -36,7 +36,7 @@ func (expense *Expense) ExpenseParticipants() (items []string, err error) {
 // get posts to a thread
 func (expense *Expense) AddParticipant(name string) (err error) {
 	//defer db.Close()
-	participant, err := ParticipantByName(name)
+	participant, err := ParticipantByName(name, expense.BillSplitID)
 	if err != nil {
 		return
 	}
@@ -89,7 +89,10 @@ func (expense Expense) Balance() map[string]float64 {
 	if err != nil {
 		log.Fatal(err)
 	}
-	payer, err := ParticipantByName(expense.PayerName)
+	payer, err := ParticipantByName(expense.PayerName, expense.BillSplitID)
+	if err != nil {
+		log.Fatal(err)
+	}
 	balance := make(map[string]float64)
 	balance[payer.Name] = expense.Amount
 	for _, participant := range participants {
