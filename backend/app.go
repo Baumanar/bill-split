@@ -9,6 +9,7 @@ import (
 	"net/http"
 )
 
+// App contains pointer to the database and the router
 type App struct {
 	Router *mux.Router
 	DB     *sql.DB
@@ -50,7 +51,6 @@ func (c *CORSRouterDecorator) ServeHTTP(writer http.ResponseWriter, req *http.Re
 	c.R.ServeHTTP(writer, req)
 }
 
-
 // NewBillSplit creates a new billSplit in the database
 func (a *App) NewBillSplit(writer http.ResponseWriter, request *http.Request) {
 	log.Println("NewBillSplit")
@@ -78,7 +78,6 @@ func (a *App) NewBillSplit(writer http.ResponseWriter, request *http.Request) {
 		RespondWithJSON(writer, http.StatusCreated, body)
 	}
 }
-
 
 // GetBillSplit gets a billsplit according to its name
 func (a *App) GetBillSplit(writer http.ResponseWriter, request *http.Request) {
@@ -146,7 +145,6 @@ func (a *App) GetBillSplitParticipants(writer http.ResponseWriter, request *http
 	}
 }
 
-
 // NewParticipants add new participants records to a billsplit in the database
 func (a *App) NewParticipants(writer http.ResponseWriter, request *http.Request) {
 	log.Println("NewParticipants")
@@ -170,7 +168,6 @@ func (a *App) NewParticipants(writer http.ResponseWriter, request *http.Request)
 		RespondWithJSON(writer, http.StatusCreated, participants)
 	}
 }
-
 
 type expenseInfo struct {
 	BillSplitID  int
@@ -214,7 +211,6 @@ func (a *App) GetExpense(writer http.ResponseWriter, request *http.Request) {
 	}
 }
 
-
 // NewExpense creates a new expense record in the database
 func (a *App) NewExpense(writer http.ResponseWriter, request *http.Request) {
 	log.Println("NewExpense")
@@ -247,7 +243,6 @@ func (a *App) NewExpense(writer http.ResponseWriter, request *http.Request) {
 		RespondWithJSON(writer, http.StatusCreated, body)
 	}
 }
-
 
 // GetParticipantsBalance gets the balance of each participants to a billsplit
 func (a *App) GetParticipantsBalance(writer http.ResponseWriter, request *http.Request) {

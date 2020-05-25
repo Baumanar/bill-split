@@ -14,7 +14,6 @@ func ErrorMessage(writer http.ResponseWriter, request *http.Request, msg string)
 	http.Redirect(writer, request, strings.Join(url, ""), 302)
 }
 
-
 // RespondWithJSON marshals the payload to a json and sends response via the ResponseWriter
 func RespondWithJSON(w http.ResponseWriter, code int, payload interface{}) {
 	response, _ := json.Marshal(payload)

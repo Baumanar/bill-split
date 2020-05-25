@@ -201,6 +201,9 @@ func (billSplit *BillSplit) GetFullBalance() (fullBalance map[string]float64, er
 	return
 }
 
+// Debt is a struct for debt description:
+// Debtor: participant that owes money
+// Creditor: participant that claims money
 type Debt struct {
 	Debtor   string
 	Creditor string
