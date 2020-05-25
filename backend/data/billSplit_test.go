@@ -126,9 +126,9 @@ func TestBillSplit_GetDebts(t *testing.T) {
 		wantErr      bool
 	}{
 		{"test0", map[string]value{
-			"C": value{"B", 12.5},
-			"A": value{"B", 2.5},
-			"D": value{"B", 2.5},
+			"C": {"B", 12.5},
+			"A": {"B", 2.5},
+			"D": {"B", 2.5},
 		}, false},
 	}
 	for _, tt := range tests {
