@@ -4,6 +4,7 @@ import (
 	"crypto/rand"
 	"database/sql"
 	"fmt"
+	// Postgres driver lib
 	_ "github.com/lib/pq"
 	"log"
 	"os"
@@ -13,15 +14,15 @@ import (
 )
 
 var (
-	// DB_USER: database username
+	// DB_USER  database username
 	DB_USER = GetEnv("DB_USER", "postgres")
-	// DB_PASSWORD: username password
+	// DB_PASSWORD username password
 	DB_PASSWORD = GetEnv("DB_PASSWORD", "password")
-	// DB_NAME: database name
+	// DB_NAME database name
 	DB_NAME = GetEnv("DB_NAME", "test_bill")
-	// DB_HOST: database connection host
+	// DB_HOST database connection host
 	DB_HOST = GetEnv("DB_HOST", "localhost")
-	// DB_PORT: database connection port
+	// DB_PORT database connection port
 	DB_PORT = GetEnv("DB_PORT", "5432")
 )
 
@@ -218,6 +219,7 @@ func ParticipantExpenseDeleteAll() (err error) {
 	return
 }
 
+// SetupDB clears the database completely
 func SetupDB() {
 	err := ParticipantExpenseDeleteAll()
 	if err != nil {

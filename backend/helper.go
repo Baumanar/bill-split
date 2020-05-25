@@ -8,13 +8,15 @@ import (
 	"strings"
 )
 
-// Convenience function to redirect to the error message page
-func errorMessage(writer http.ResponseWriter, request *http.Request, msg string) {
+// ErrorMessage Convenience function to redirect to the error message page
+func ErrorMessage(writer http.ResponseWriter, request *http.Request, msg string) {
 	url := []string{"/err?msg=", msg}
 	http.Redirect(writer, request, strings.Join(url, ""), 302)
 }
 
-func respondWithJSON(w http.ResponseWriter, code int, payload interface{}) {
+
+// RespondWithJSON marshals the payload to a json and sends response via the ResponseWriter
+func RespondWithJSON(w http.ResponseWriter, code int, payload interface{}) {
 	response, _ := json.Marshal(payload)
 
 	w.Header().Set("Content-Type", "application/json")
@@ -25,6 +27,7 @@ func respondWithJSON(w http.ResponseWriter, code int, payload interface{}) {
 	}
 }
 
+// PopulateDB clears the db and creates new fake data
 func PopulateDB() {
 
 	//#####################################################################################

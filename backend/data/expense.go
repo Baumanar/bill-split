@@ -5,6 +5,7 @@ import (
 	"strings"
 )
 
+// Expense struct has info of an Expense
 type Expense struct {
 	Id          int
 	Uuid        string
@@ -15,7 +16,7 @@ type Expense struct {
 	CreatedAt   JSONTime
 }
 
-// get posts to a thread
+// ExpenseParticipants gets the participants to and expense
 func (expense *Expense) ExpenseParticipants() (items []string, err error) {
 	//defer db.Close()
 	rows, err := Db.Query("SELECT p.name FROM participant_expense pe INNER JOIN participant p ON p.id = pe.participant_id WHERE pe.expense_id = $1 ORDER BY p.created_at DESC", expense.Id)
@@ -33,7 +34,7 @@ func (expense *Expense) ExpenseParticipants() (items []string, err error) {
 	return
 }
 
-// get posts to a thread
+// AddParticipant adds one participants to an expense
 func (expense *Expense) AddParticipant(name string) (err error) {
 	//defer db.Close()
 	participant, err := ParticipantByName(name, expense.BillSplitID)
@@ -52,7 +53,7 @@ func (expense *Expense) AddParticipant(name string) (err error) {
 	return
 }
 
-// Create a new item to a survey
+// AddParticipants adds multiple participants to an expense
 func (expense *Expense) AddParticipants(names []string) (err error) {
 
 	billSplit, err := BillSplitByID(expense.BillSplitID)
@@ -84,6 +85,7 @@ func (expense *Expense) AddParticipants(names []string) (err error) {
 	return
 }
 
+// Balance gets the balance of each participants of the expense
 func (expense Expense) Balance() map[string]float64 {
 	participants, err := expense.ExpenseParticipants()
 	if err != nil {
