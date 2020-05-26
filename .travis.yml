@@ -2,6 +2,22 @@ language: go
 go:
   - 1.14.x
 
+
+env:
+  - DB_USER=postgres
+  - DB_NAME=travis_ci_test
+  - DB_PORT=5432
+  - DB_HOST=localhost
+
+
+services:
+  - postgresql
+
+before_script:
+  - psql -c 'create database travis_ci_test;' -U postgres
+  - psql -f database/init/setup.sql -d travis_ci_test
+
+
 script:
   - go test -coverprofile=coverage.txt -covermode=atomic ./...
 
