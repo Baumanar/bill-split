@@ -4,10 +4,7 @@ go:
 
 
 env:
-  - DB_USER=postgres
-  - DB_NAME=travis_ci_test
-  - DB_PORT=5432
-  - DB_HOST=localhost
+  - DB_USER=postgres DB_NAME=travis_ci_test DB_PORT=5432 DB_HOST=localhost
 
 
 services:
