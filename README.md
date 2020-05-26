@@ -1,4 +1,10 @@
-# billsplit
+[![Go Report Card](https://goreportcard.com/badge/Baumanar/bill-split)](https://goreportcard.com/report/github.com/Baumanar/bill-split) 
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://github.com/Baumanar/bill-split/blob/master/LICENSE) 
+![Build](https://travis-ci.org/Baumanar/bill-split.svg?branch=master) 
+[![codecov](https://codecov.io/gh/Baumanar/bill-split/branch/master/graph/badge.svg)](https://codecov.io/gh/Baumanar/bill-split)
+
+
+# Bill Split
 
 A simple bill splitting app with a Go backend and a Vuejs frontend communicating via a REST api.
 Share expenses among friends easily by adding expenses to a bill split and automatically get the balance of each participant.
@@ -6,24 +12,24 @@ Share expenses among friends easily by adding expenses to a bill split and autom
 **Features:**
 * View and add new bill splits
 
-![HTTP Log-monitor](images/billsplitlist.png)
+![HTTP bill-split](images/billsplitlist.png)
 
 * View expenses associated to a bill split
 
-![HTTP Log-monitor](images/billsplit.png)
+![HTTP bill-split](images/billsplit.png)
 
 * Add new expenses
 
-![HTTP Log-monitor](images/newexpense.png)
+![HTTP bill-split](images/newexpense.png)
 
 * Add new participants to a bill split
 
-![HTTP Log-monitor](images/manageparticipants.png)
+![HTTP bill-split](images/manageparticipants.png)
 
 
 * View balance of participants
 
-![HTTP Log-monitor](images/balance.png)
+![HTTP bill-split](images/balance.png)
 
 
 
