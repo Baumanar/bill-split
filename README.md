@@ -1,4 +1,4 @@
-[![Go Report Card](https://goreportcard.com/badge/Baumanar/bill-split)](https://goreportcard.com/report/github.com/Baumanar/bill-split) 
+[![Go Report Card](https://goreportcard.com/badge/github.com/Baumanar/bill-split)](https://goreportcard.com/report/github.com/Baumanar/bill-split)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://github.com/Baumanar/bill-split/blob/master/LICENSE) 
 ![Build](https://travis-ci.org/Baumanar/bill-split.svg?branch=master) 
 [![codecov](https://codecov.io/gh/Baumanar/bill-split/branch/master/graph/badge.svg)](https://codecov.io/gh/Baumanar/bill-split)
